@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diabete.pannelli;
+package diabete.interfaccia;
 
+import diabete.dati.StatisticaInsulina;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -47,4 +48,8 @@ public class PannelloInsulina extends javafx.scene.layout.VBox {
 		
 		// nodes.addAll(insulinaLogo, elementi);
 	}
+
+    public void aggiornaDati(StatisticaInsulina[] si) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

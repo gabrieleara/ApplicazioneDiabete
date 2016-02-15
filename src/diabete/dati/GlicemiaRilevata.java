@@ -14,11 +14,11 @@ import java.util.Date;
 public class GlicemiaRilevata implements java.io.Serializable {
 	
 	public final Date timestamp;
-	public final double valore;
+	public final int valore;
 
-	public GlicemiaRilevata(Date timestamp, double valore) {
-		this.timestamp = timestamp;
-		this.valore = valore;
+	public GlicemiaRilevata(Date timestamp, int valore) {
+            this.timestamp = timestamp;
+            this.valore = valore;
 	}
 	
 }

@@ -3,13 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diabete;
+package diabete.interfaccia;
 
-import diabete.dati.TipoStatistica;
-import diabete.pannelli.PannelloGlucosio;
-import diabete.pannelli.PannelloInsulina;
-import diabete.pannelli.PannelloGraficoGlicemico;
-import diabete.pannelli.PannelloGlucosioBasso;
+import diabete.dati.Cache;
 import java.util.Collection;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
