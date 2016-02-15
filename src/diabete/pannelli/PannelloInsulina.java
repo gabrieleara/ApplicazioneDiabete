@@ -30,29 +30,20 @@ public class PannelloInsulina extends javafx.scene.layout.VBox {
 		this.azioneLenta = new SimpleStringProperty();
 		this.totale = new SimpleStringProperty();
 		
-		/*
-				ObservableList<Node> nodes = super.getChildren();
-		
-		ImageView insulinaLogo = new ImageView("http://i68.tinypic.com/118zo7m.png");
-		insulinaLogo.setPreserveRatio(true);
-		insulinaLogo.setFitHeight(60.);
-		
-		VBox elementi = new VBox();
-		*/
 		Elemento titolo = new Elemento("Insulina registrata giornaliera", "");
 		
 		titolo.setTitolo();
 		
-		Elemento azioneRapida = new Elemento("Insulina ad azione rapida", "", "");
-		azioneRapida.getValoreProperty().bind(this.azioneRapida);
+		Elemento rapida = new Elemento("Insulina ad azione rapida", "", "");
+		rapida.getValoreProperty().bind(this.azioneRapida);
 		
-		Elemento azioneLenta = new Elemento("Insulina ad azione lenta", "", "");
-		azioneLenta.getValoreProperty().bind(this.azioneLenta);
+		Elemento lenta = new Elemento("Insulina ad azione lenta", "", "");
+		lenta.getValoreProperty().bind(this.azioneLenta);
 		
-		Elemento totale = new Elemento("Insulina giornaliera totale", "");
-		totale.getValoreProperty().bind(this.totale);
+		Elemento somma = new Elemento("Insulina giornaliera totale", "");
+		somma.getValoreProperty().bind(this.totale);
 		
-		super.getChildren().addAll(titolo, azioneRapida, azioneLenta, totale);
+		super.getChildren().addAll(titolo, rapida, lenta, somma);
 		
 		// nodes.addAll(insulinaLogo, elementi);
 	}

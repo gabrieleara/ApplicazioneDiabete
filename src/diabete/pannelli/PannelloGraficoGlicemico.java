@@ -12,6 +12,7 @@ import javafx.collections.*;
 import javafx.scene.chart.*;
 import javafx.scene.chart.XYChart.*;
 import javafx.scene.control.Label;
+import javafx.scene.shape.Rectangle;
 
 /**
  *
@@ -20,6 +21,12 @@ import javafx.scene.control.Label;
 public class PannelloGraficoGlicemico extends javafx.scene.layout.VBox {
 	final ObservableList<XYChart.Data<Number, Number>> datiAttuali;
 	final ConvertitoreTemporale conv;
+	
+	private void impostaNodoNascosto(Data<?,?> dato) {
+		Rectangle rect = new Rectangle(0, 0);
+		rect.setVisible(false);
+		dato.setNode(rect);
+	}
 	
 	public PannelloGraficoGlicemico() {
 		super();
@@ -52,6 +59,7 @@ public class PannelloGraficoGlicemico extends javafx.scene.layout.VBox {
 		
 		XYChart<Number, Number> lineChart = new LineChart(orario, valore, serie);
 		
+		
 		lineChart.setMaxHeight(250);
 		
 		super.getChildren().add(lineChart);
@@ -64,7 +72,9 @@ public class PannelloGraficoGlicemico extends javafx.scene.layout.VBox {
 		
 		for(GlicemiaRilevata valore : dati) {
 			tempo = conv.fromDate(valore.timestamp);
-			datiAttuali.add(new Data<>(tempo, valore.valore));
+			Data<Number, Number> data = new Data<>(tempo, valore.valore);
+			impostaNodoNascosto(data);
+			datiAttuali.add(data);
 		}
 	}
 }

@@ -5,8 +5,7 @@
  */
 package diabete.pannelli;
 
-import diabete.dati.GlicemiaRilevata;
-import java.util.Collection;
+import diabete.AnalizzatoreDiabetico;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -30,7 +29,14 @@ public class PannelloGlucosio extends javafx.scene.layout.VBox {
 		valoreSopra.set(Integer.toString(sopra));
 		valoreDentro.set(Integer.toString(dentro));
 		valoreSotto.set(Integer.toString(sotto));
-		
+	}
+	
+	public void aggiornaDati(int[] stat) {
+		aggiornaDati(
+				stat[AnalizzatoreDiabetico.INDEX_GLUCOSIO_MEDIO],
+				stat[AnalizzatoreDiabetico.INDEX_GLUCOSIO_SOPRA],
+				stat[AnalizzatoreDiabetico.INDEX_GLUCOSIO_SOTTO]
+				);
 	}
 	
 	public PannelloGlucosio () {
@@ -40,17 +46,6 @@ public class PannelloGlucosio extends javafx.scene.layout.VBox {
 		this.valoreSopra = new SimpleStringProperty();
 		this.valoreMedio = new SimpleStringProperty();
 		
-		/* ObservableList<Node> nodes = super.getChildren(); */
-		/*
-		ImageView glicemiaLogo = new ImageView("http://i68.tinypic.com/118zo7m.png");
-		glicemiaLogo.setPreserveRatio(true);
-		glicemiaLogo.setFitHeight(60.);
-		*/
-		
-		
-		/*
-		VBox elementi = new VBox();
-		*/
 		Elemento titolo = new Elemento("Glucosio medio", "mg/dL");
 		titolo.getValoreProperty().bind(valoreMedio);
 		
@@ -66,7 +61,5 @@ public class PannelloGlucosio extends javafx.scene.layout.VBox {
 		sotto.getValoreProperty().bind(valoreSotto);
 		
 		super.getChildren().addAll(titolo, sopra, dentro, sotto);
-		
-		/* nodes.addAll(glicemiaLogo, elementi); */
 	}
 }

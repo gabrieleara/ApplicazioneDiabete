@@ -5,16 +5,13 @@
  */
 package diabete.pannelli;
 
-import diabete.dati.GlicemiaRilevata;
-import java.util.Collection;
+import diabete.AnalizzatoreDiabetico;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.image.ImageView;
 
 /**
  *
  * @author Gabriele Ara
- * @TODO: AnchorPane
  */
 public class PannelloGlucosioBasso extends javafx.scene.layout.VBox {
 	private StringProperty eventi;
@@ -26,18 +23,19 @@ public class PannelloGlucosioBasso extends javafx.scene.layout.VBox {
 		this.durata.set(Integer.toString(durata));
 	}
 	
+	public void aggiornaDati(int[] stat) {
+		aggiornaDati(
+				stat[AnalizzatoreDiabetico.INDEX_NUMERO_EVENTI],
+				stat[AnalizzatoreDiabetico.INDEX_DURATA_EVENTI]
+				
+				);
+	}
+	
 	public PannelloGlucosioBasso () {
 		super();
 		this.eventi = new SimpleStringProperty();
 		this.durata = new SimpleStringProperty();
 		
-		// ObservableList<Node> nodes = super.getChildren();
-		
-		ImageView allarmeLogo = new ImageView("http://i68.tinypic.com/118zo7m.png");
-		allarmeLogo.setPreserveRatio(true);
-		allarmeLogo.setFitHeight(60.);
-		
-		/* VBox elementi = new VBox();*/ 
 		Elemento titolo = new Elemento("Eventi di glucosio basso", "");
 		titolo.getValoreProperty().bind(eventi);
 		
@@ -47,7 +45,5 @@ public class PannelloGlucosioBasso extends javafx.scene.layout.VBox {
 		valore.getValoreProperty().bind(durata);
 		
 		super.getChildren().addAll(titolo, valore);
-		
-		// nodes.addAll(allarmeLogo, elementi);
 	}
 }

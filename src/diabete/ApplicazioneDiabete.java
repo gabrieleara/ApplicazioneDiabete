@@ -5,12 +5,15 @@
  */
 package diabete;
 
+import diabete.dati.GlicemiaRilevata;
 import diabete.dati.TipoStatistica;
 import diabete.pannelli.*;
 import diabete.util.CalendarioSettimanale;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import javafx.application.Application;
@@ -38,19 +41,48 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 	
 	private Pane[] pannelli;
 	
+	void setUtenteVisualizzato() {
+		ObservableList<Toggle> bottoni = utenti.getToggles();
+		
+		for (Iterator<Toggle> it = bottoni.iterator(); it.hasNext();) {
+			RadioButton utente = (RadioButton) it.next();
+			if(utente.getText().equals(utenteAttuale)) {
+				utente.setSelected(true);
+				utente.requestFocus();
+				break;
+			}
+		}
+	}
+	
 	/*
 	 * @ TODO
 	 */
 	private void aggiornaUI() {
 		/* imposta utente nel gruppo */
+		setUtenteVisualizzato();
 		
-		/* ottiene valori per grafico e aggiorna i dati */
+		/* ottiene valori glicemici */
+		ArrayList<GlicemiaRilevata> gc = GestoreDatiDiabetici.glicemiaSettimanale(utenteAttuale, Calendar.getInstance().getTime());
+		
+		/* aggiorna i dati del grafico */
+		
+		PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelli[CostruttoreUI.INDEX_P_GRAFICO];
+		pgg.aggiornaDati(gc);
 		
 		/* ottiene le statistiche e aggiorna i dati */
+		int[] stat = AnalizzatoreDiabetico.analizzaGlucosioMedio(gc);
+		PannelloGlucosio pg = (PannelloGlucosio) pannelli[CostruttoreUI.INDEX_P_GLUCOSIO];
+		pg.aggiornaDati(stat);
+		
+		stat = AnalizzatoreDiabetico.analizzaEventiGlucosioBasso(gc);
+		PannelloGlucosioBasso pgb = (PannelloGlucosioBasso) pannelli[CostruttoreUI.INDEX_P_GLUCOSIO_BASSO];
+		pgb.aggiornaDati(stat);
+		
+		/* ottiene e aggiorna i dati dell'insulina */
+		
 		
 		/* imposta la data nel campo data */
 		
-		System.out.println("Cambio utente: " + utenteAttuale + ".");
 	}
 	
 	private void aggiornaUI(Date data) {
@@ -111,6 +143,9 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 		
 		if(src == settimanaAvanti) {
 			/* TODO */
+			
+			/* TEST */
+			aggiornaUI();
 			return;
 		}
 		
@@ -123,18 +158,10 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 	private void impostaValoriIniziali() {
 		Cache c = Cache.getValoreIniziale();
 		
-		ObservableList<Toggle> bottoni = utenti.getToggles();
 		utenteAttuale = c.getUtenteAttuale();
 		dataAttuale = c.getDataAttuale();
 		
-		for (Iterator<Toggle> it = bottoni.iterator(); it.hasNext();) {
-			RadioButton utente = (RadioButton) it.next();
-			if(utente.getText().equals(utenteAttuale)) {
-				utente.setSelected(true);
-				utente.requestFocus();
-				break;
-			}
-		}
+		setUtenteVisualizzato();
 		
 		PannelloGlucosio pg = (PannelloGlucosio) pannelli[CostruttoreUI.INDEX_P_GLUCOSIO];
 		pg.aggiornaDati(

@@ -45,13 +45,24 @@ public class CalendarioSettimanale extends GregorianCalendar {
     }
     
     public void resetTempoDelGiorno() {
-	set(HOUR_OF_DAY, 0);
-	set(MINUTE, 0);
-	set(SECOND, 0);
-	set(MILLISECOND, 0);
+		set(HOUR_OF_DAY, 0);
+		set(MINUTE, 0);
+		set(SECOND, 0);
+		set(MILLISECOND, 0);
     }
+	
+	public void setMezzanotte() {
+		set(HOUR_OF_DAY, 23);
+		set(MINUTE, 59);
+		set(SECOND, 59);
+		set(MILLISECOND, 999);
+	}
     
     public void lunedi() {
-	set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); /* TODO: test this */
+		set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+    }
+	
+	public void domenica() {
+		set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
     }
 }
