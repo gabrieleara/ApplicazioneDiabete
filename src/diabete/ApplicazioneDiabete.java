@@ -5,7 +5,6 @@
  */
 package diabete;
 
-import com.thoughtworks.xstream.XStream;
 import diabete.interfaccia.*;
 import diabete.dati.*;
 import diabete.util.*;
@@ -19,7 +18,6 @@ import javafx.application.Application;
 import javafx.beans.value.*;
 import javafx.collections.*;
 import javafx.event.*;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;

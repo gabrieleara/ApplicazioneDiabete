@@ -5,10 +5,6 @@
  */
 package diabete.interfaccia;
 
-import diabete.StatoApplicazione;
-import java.util.Collection;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 

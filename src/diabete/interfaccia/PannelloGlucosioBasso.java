@@ -5,7 +5,6 @@
  */
 package diabete.interfaccia;
 
-import diabete.AnalizzatoreDiabetico;
 import diabete.StatoApplicazione;
 import diabete.dati.TipoStatistica;
 import javafx.beans.binding.Bindings;

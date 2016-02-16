@@ -5,7 +5,6 @@
  */
 package diabete.util;
 
-import diabete.util.CalendarioSettimanale;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
