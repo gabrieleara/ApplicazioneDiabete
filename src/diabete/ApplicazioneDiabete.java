@@ -11,10 +11,10 @@ import diabete.util.*;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javafx.application.Application;
 import javafx.beans.value.*;
 import javafx.collections.*;
 import javafx.event.*;
@@ -29,17 +29,23 @@ import org.xml.sax.SAXException;
  *
  * @author Gabriele Ara
  */
-public class ApplicazioneDiabete extends Application implements ChangeListener<Toggle>, EventHandler<ActionEvent>{
-	private Stage stage;
+public class ApplicazioneDiabete extends javafx.application.Application {
+	/* Se ho questo posso recuperare la roba con id e mi serve per
+	 * il filechooser.
+	 */
+	private Stage primaryStage;
+	
+	/* TODO: questi in teoria non mi servono. */
 	private Button leggiFile;
 	private Button settimanaIndietro;
 	private Button settimanaAvanti;
+	
+	/* Questi recuperali con id. */
 	private TextField settimanaAttuale;
 	private ToggleGroup pazienti;
 	
 	private StatoApplicazione stato;
-	
-	SimpleDateFormat df = new SimpleDateFormat("dd/MM/YYYY");
+	private SimpleDateFormat df = new SimpleDateFormat("dd/MM/YYYY");
     
 	/* TODO:
 	 * vedrai non sono necessari, forse servono solo
@@ -47,7 +53,7 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 	 */
 	private Pane[] pannelliDati;
 	
-	private void aggiornaUtenteVisualizzato() {
+	private void aggiornaPazienteVisualizzato() {
 		String pazienteAttuale = stato.getPazienteAttuale().get();
 		
 		ObservableList<Toggle> bottoni = pazienti.getToggles();
@@ -70,7 +76,7 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 		Date dataAttuale = stato.getDataAttuale().get();
 		
 		/* imposta utente nel gruppo */
-		aggiornaUtenteVisualizzato();
+		aggiornaPazienteVisualizzato();
                 
         /* TODO: imposta la data nel campo data con la bind */
 		settimanaAttuale.setText(df.format(dataAttuale));
@@ -137,7 +143,7 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Scegli File");
-		File f = fileChooser.showOpenDialog(stage);
+		File f = fileChooser.showOpenDialog(primaryStage);
 
 		if(f == null)
 			return;
@@ -170,43 +176,6 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 
 	}
 	
-	@Override
-	public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-		RadioButton rb = (RadioButton) newValue;
-		aggiornaStatistiche(rb.getText());
-	}
-	
-	@Override
-	public void handle(ActionEvent event) {
-		try {
-			if(settimanaAttuale == (TextField) event.getSource()) {
-				/**/
-				return;
-			}
-		} catch(ClassCastException ex) {
-		}
-		
-		Button src = (Button) event.getSource();
-		
-		if(src == leggiFile) {
-			leggiFile();
-			return;
-		}
-		
-		if(src == settimanaAvanti) {
-			/* TODO */
-			
-			/* TEST */
-			aggiornaStatistiche();
-			return;
-		}
-		
-		if(src == settimanaIndietro) {
-			/* TODO */
-			return;
-		}
-	}
-	
 	private void impostaListeners() {		
 		stato.getPazienteAttuale().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
 			aggiornaStatistiche();
@@ -229,15 +198,34 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 			}
 		});
 		
+		pazienti.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) -> {
+			RadioButton rb = (RadioButton) newValue;
+			aggiornaStatistiche(rb.getText());
+		});
+		
 		PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelliDati[CostruttoreUI.INDEX_P_GRAFICO];
 		pgg.aggiornaDati(stato.getDatiPerGrafico());
 		
-		pazienti.selectedToggleProperty().addListener(this);
+		leggiFile.setOnAction((ActionEvent event) -> {
+			leggiFile();
+		});
 		
-		leggiFile.setOnAction(this);
-		settimanaIndietro.setOnAction(this);
-		settimanaAvanti.setOnAction(this);
-		settimanaAttuale.setOnAction(this);
+		settimanaIndietro.setOnAction((ActionEvent event) -> {
+			settimanaIndietro();
+		});
+		
+		settimanaAvanti.setOnAction((ActionEvent event) -> {
+			settimanaAvanti();
+		});
+		
+		settimanaAttuale.setOnAction((ActionEvent event) -> {
+			try {
+				Date d = df.parse(settimanaAttuale.getText());
+				aggiornaStatistiche(d);
+			} catch(ParseException ex) {
+				ex.printStackTrace(); // TODO
+			}
+		});
 	}
 	
 	private Pane creaUI() {
@@ -265,14 +253,14 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 		}
 		
 		settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
-		aggiornaUtenteVisualizzato();
+		aggiornaPazienteVisualizzato();
 		
 		return contenuto;
 	}
 	
 	@Override
 	public void start(Stage primaryStage) {
-        stage = primaryStage;
+        this.primaryStage = primaryStage;
 		
 		try {
 			Cache cache = Cache.leggiCache();
@@ -286,11 +274,11 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 		Pane root = creaUI();
 		Scene scene = new Scene(root);
 		
-		stage.setTitle("Controllo del glucosio");
-		stage.setScene(scene);
-		stage.setMinWidth(900 + 20); // TODO: per quale motivo?
-		stage.setMinHeight(500 + 40); // TODO: per quale motivo?
-		stage.show();
+		primaryStage.setTitle("Controllo del glucosio");
+		primaryStage.setScene(scene);
+		primaryStage.setMinWidth(900 + 20); // TODO: per quale motivo?
+		primaryStage.setMinHeight(500 + 40); // TODO: per quale motivo?
+		primaryStage.show();
 	}
 
 	/**
@@ -303,5 +291,15 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 	private void aggiungiPaziente(String paziente) {
 		RadioButton rb = CostruttoreUI.creaBottonePaziente(paziente, "bottoneutente", pazienti);
 		CostruttoreUI.aggiungiPaziente(rb);
+	}
+
+	private void settimanaIndietro() {
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+
+	private void settimanaAvanti() {
+		/*TODO*/
+		aggiornaStatistiche();
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 }

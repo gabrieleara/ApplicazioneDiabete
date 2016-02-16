@@ -7,6 +7,7 @@ package diabete.interfaccia;
 
 import diabete.StatoApplicazione;
 import diabete.dati.TipoStatistica;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
