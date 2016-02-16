@@ -5,9 +5,11 @@
  */
 package diabete.interfaccia;
 
-import diabete.AnalizzatoreDiabetico;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import diabete.StatoApplicazione;
+import diabete.dati.TipoStatistica;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 /**
  *
@@ -15,50 +17,40 @@ import javafx.beans.property.StringProperty;
  * @TODO: AnchorPane
  */
 public class PannelloGlucosio extends javafx.scene.layout.VBox {
-	private StringProperty valoreMedio;
-	private StringProperty valoreSopra;
-	private StringProperty valoreDentro;
-	private StringProperty valoreSotto;
-
-	public void aggiornaDati(int medio, int sopra, int sotto) throws IllegalArgumentException {
-		if(sopra + sotto > 100)
-			throw new IllegalArgumentException("Sopra e sotto superano 100!");
-		
-		int dentro = 100 - (sopra + sotto);
-		valoreMedio.set(Integer.toString(medio));
-		valoreSopra.set(Integer.toString(sopra));
-		valoreDentro.set(Integer.toString(dentro));
-		valoreSotto.set(Integer.toString(sotto));
-	}
-	
-	public void aggiornaDati(int[] stat) {
-		aggiornaDati(
-				stat[AnalizzatoreDiabetico.INDEX_GLUCOSIO_MEDIO],
-				stat[AnalizzatoreDiabetico.INDEX_GLUCOSIO_SOPRA],
-				stat[AnalizzatoreDiabetico.INDEX_GLUCOSIO_SOTTO]
-				);
-	}
+	private IntegerProperty valoreMedio;
+	private IntegerProperty valoreSopra;
+	private IntegerProperty valoreDentro;
+	private IntegerProperty valoreSotto;
 	
 	public PannelloGlucosio () {
 		super();
-		this.valoreSotto = new SimpleStringProperty();
-		this.valoreDentro = new SimpleStringProperty();
-		this.valoreSopra = new SimpleStringProperty();
-		this.valoreMedio = new SimpleStringProperty();
+		this.valoreSotto = new SimpleIntegerProperty();
+		this.valoreDentro = new SimpleIntegerProperty();
+		this.valoreSopra = new SimpleIntegerProperty();
+		this.valoreMedio = new SimpleIntegerProperty();
+		
+		IntegerProperty[] stat = StatoApplicazione.getInstance().getStatistiche();
+		
+		valoreMedio.bind(stat[TipoStatistica.GLUCOSIO_MEDIO.valore]);
+		valoreSopra.bind(stat[TipoStatistica.GLUCOSIO_SOPRA_INTERVALLO.valore]);
+		valoreSotto.bind(stat[TipoStatistica.GLUCOSIO_SOTTO_INTERVALLO.valore]);
+		
+		IntegerProperty tot = new SimpleIntegerProperty(100);
+		valoreDentro.bind(tot.subtract(valoreSopra.add(valoreSotto)));
 		
 		Elemento titolo = new Elemento("Glucosio medio", "mg/dL");
-		titolo.getValoreProperty().bind(valoreMedio);
+		titolo.getValoreProperty().bind(Bindings.convert(valoreMedio));
 		
 		titolo.setTitolo();
 		
 		Elemento sopra = new Elemento("% sopra l'intervallo", "%");
-		sopra.getValoreProperty().bind(valoreSopra);
+		sopra.getValoreProperty().bind(Bindings.convert(valoreSopra));
 		
 		Elemento dentro = new Elemento("% nell'intervallo", "%");
-		dentro.getValoreProperty().bind(valoreDentro);
+		dentro.getValoreProperty().bind(Bindings.convert(valoreDentro));
 		
 		Elemento sotto = new Elemento("% sotto l'intervallo", "%");
-		sotto.getValoreProperty().bind(valoreSotto);
+		sotto.getValoreProperty().bind(Bindings.convert(valoreSotto));
 		
 		super.getChildren().addAll(titolo, sopra, dentro, sotto);
 	}

@@ -5,7 +5,7 @@
  */
 package diabete.interfaccia;
 
-import diabete.dati.Cache;
+import diabete.StatoApplicazione;
 import java.util.Collection;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -24,7 +24,7 @@ public class CostruttoreUI {
 	public static final int INDEX_P_GLUCOSIO_BASSO = 3;
 	public static final int INDEX_P_COMANDI = 4;
 	
-	private static Pane pannelloUtenti;
+	private static Pane pannelloPazienti;
 
 	private CostruttoreUI() {
 		
@@ -32,9 +32,7 @@ public class CostruttoreUI {
 	
 	public static TextField creaCampoTesto(String classe) {
 		TextField tf = new TextField();
-		
 		tf.getStyleClass().add(classe);
-		
 		return tf;
 	}
 	
@@ -53,10 +51,10 @@ public class CostruttoreUI {
 	}
 	
 	/*
-	 * @TODO: immagine come sfondo della classe, pallino nascorso e padding
+	 * @TODO: immagine come sfondo della classe, pallino nascorto e padding
 	 * sinistro necessari.
 	 */
-	public static RadioButton creaBottoneUtente(String nome, String classe, ToggleGroup gruppo) {
+	public static RadioButton creaBottonePaziente(String nome, String classe, ToggleGroup gruppo) {
 		RadioButton rb = new RadioButton(nome);
 		rb.getStyleClass().add(classe);
 		rb.setMinWidth(200);
@@ -68,8 +66,8 @@ public class CostruttoreUI {
 		return rb;
 	}
 	
-	public void aggiungiUtente(ToggleButton utente) {
-		pannelloUtenti.getChildren().add(utente);
+	public static void aggiungiPaziente(ToggleButton paziente) {
+		pannelloPazienti.getChildren().add(paziente);
 	}
 	
 	/*
@@ -104,32 +102,21 @@ public class CostruttoreUI {
 	}
 	
 	/*
-	 * @TODO: recupera classe da impostazioni. Ultimo utente da cache.
+	 * @TODO: recupera classe da impostazioni.
 	 */
-	public static Pane creaPannelloUtenti(ToggleGroup gruppo) {
+	public static Pane creaPannelloPazienti(ToggleGroup gruppo) {
 		VBox pannello = new VBox();
-		ObservableList<Node> lista = pannello.getChildren();
-		
-		Collection<String> utenti = Cache.getValoreIniziale().getUtenti();
 		pannello.getStyleClass().add("utenti");
 		
 		pannello.setMinWidth(200);
 		pannello.setMaxWidth(200);
 		pannello.setMinHeight(500. - 80.);
 		
-		RadioButton rb;
-		for(String nome : utenti) {
-			rb = CostruttoreUI.creaBottoneUtente(nome, "bottoneutente", gruppo);
-			lista.add(rb);
-		}
-		
 		return pannello;
 	}
 	
 	public static Pane[] creaPannelliDati(Button b1, Button b2, TextField tf) {
 		Pane[] pannelli = new Pane[5];
-		
-		Cache valori = Cache.getValoreIniziale();
 		
 		PannelloGlucosio pg = new PannelloGlucosio();
 		pg.setMinHeight(300);
@@ -190,8 +177,8 @@ public class CostruttoreUI {
 		
 		contenitore.setTop(creaIntestazione(intest));
 		
-		pannelloUtenti = creaPannelloUtenti(gruppo);
-		contenitore.setLeft(pannelloUtenti);
+		pannelloPazienti = creaPannelloPazienti(gruppo);
+		contenitore.setLeft(pannelloPazienti);
 		
 		contenitore.setCenter(creaContenuto(pannelli));
 		

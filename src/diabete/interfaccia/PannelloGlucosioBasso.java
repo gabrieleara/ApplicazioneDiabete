@@ -6,43 +6,37 @@
 package diabete.interfaccia;
 
 import diabete.AnalizzatoreDiabetico;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import diabete.StatoApplicazione;
+import diabete.dati.TipoStatistica;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 
 /**
  *
  * @author Gabriele Ara
  */
 public class PannelloGlucosioBasso extends javafx.scene.layout.VBox {
-	private StringProperty eventi;
-	private StringProperty durata;
-
-	public void aggiornaDati(int eventi, int durata) {
-		
-		this.eventi.set(Integer.toString(eventi));
-		this.durata.set(Integer.toString(durata));
-	}
-	
-	public void aggiornaDati(int[] stat) {
-		aggiornaDati(
-				stat[AnalizzatoreDiabetico.INDEX_NUMERO_EVENTI],
-				stat[AnalizzatoreDiabetico.INDEX_DURATA_EVENTI]
-				
-				);
-	}
+	private IntegerProperty eventi;
+	private IntegerProperty durata;
 	
 	public PannelloGlucosioBasso () {
 		super();
-		this.eventi = new SimpleStringProperty();
-		this.durata = new SimpleStringProperty();
+		
+		this.eventi = new SimpleIntegerProperty();
+		this.durata = new SimpleIntegerProperty();
+		
+		IntegerProperty[] stat = StatoApplicazione.getInstance().getStatistiche();
+		this.eventi.bind(stat[TipoStatistica.EVENTI_GLUCOSIO_BASSO.valore]);
+		this.durata.bind(stat[TipoStatistica.DURATA_EVENTI_GLUCOSIO_BASSO.valore]);
 		
 		Elemento titolo = new Elemento("Eventi di glucosio basso", "");
-		titolo.getValoreProperty().bind(eventi);
-		
+		titolo.getValoreProperty().bind(Bindings.convert(this.eventi));
 		titolo.setTitolo();
 		
 		Elemento valore = new Elemento("Duarata media", "min");
-		valore.getValoreProperty().bind(durata);
+		valore.getValoreProperty().bind(Bindings.convert(this.durata));
 		
 		super.getChildren().addAll(titolo, valore);
 	}

@@ -19,6 +19,7 @@ import javafx.application.Application;
 import javafx.beans.value.*;
 import javafx.collections.*;
 import javafx.event.*;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -31,25 +32,31 @@ import org.xml.sax.SAXException;
  * @author Gabriele Ara
  */
 public class ApplicazioneDiabete extends Application implements ChangeListener<Toggle>, EventHandler<ActionEvent>{
-        private Stage stage;
+	private Stage stage;
 	private Button leggiFile;
 	private Button settimanaIndietro;
 	private Button settimanaAvanti;
 	private TextField settimanaAttuale;
-	private ToggleGroup utenti;
+	private ToggleGroup pazienti;
 	
-	private String utenteAttuale;
-	private Date dataAttuale;
+	private StatoApplicazione stato;
 	
 	SimpleDateFormat df = new SimpleDateFormat("dd/MM/YYYY");
-        private Pane[] pannelli;
+    
+	/* TODO:
+	 * vedrai non sono necessari, forse servono solo
+	 * quello del grafico e quello degli utenti.
+	 */
+	private Pane[] pannelliDati;
 	
-	void setUtenteVisualizzato() {
-		ObservableList<Toggle> bottoni = utenti.getToggles();
+	private void aggiornaUtenteVisualizzato() {
+		String pazienteAttuale = stato.getPazienteAttuale().get();
+		
+		ObservableList<Toggle> bottoni = pazienti.getToggles();
 		
 		for (Iterator<Toggle> it = bottoni.iterator(); it.hasNext();) {
 			RadioButton utente = (RadioButton) it.next();
-			if(utente.getText().equals(utenteAttuale)) {
+			if(utente.getText().equals(pazienteAttuale)) {
 				utente.setSelected(true);
 				utente.requestFocus();
 				break;
@@ -60,111 +67,115 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 	/*
 	 * @ TODO
 	 */
-	private void aggiornaUI() {
+	private void aggiornaStatistiche() {
+		String pazienteAttuale = stato.getPazienteAttuale().get();
+		Date dataAttuale = stato.getDataAttuale().get();
+		
 		/* imposta utente nel gruppo */
-		setUtenteVisualizzato();
+		aggiornaUtenteVisualizzato();
                 
-                /* TODO: imposta la data nel campo data */
+        /* TODO: imposta la data nel campo data con la bind */
+		settimanaAttuale.setText(df.format(dataAttuale));
 		
 		/* ottiene valori glicemici */
-                ArrayList<GlicemiaRilevata> gc;
-                StatisticaInsulina[] si;
-                try {
-		    gc = GestoreDatiDiabetici.glicemiaSettimanale(utenteAttuale, dataAttuale);
-                    si = GestoreDatiDiabetici.insulinaSettimanale(utenteAttuale, dataAttuale);
-                } catch(SQLException ex) {
-                    ex.printStackTrace(); // TODO
-                    return;
-                }
-                
+		ArrayList<GlicemiaRilevata> gc;
+		int[] si;
+		try {
+		    gc = GestoreDatiDiabetici.glicemiaSettimanale(pazienteAttuale, dataAttuale);
+			si = GestoreDatiDiabetici.insulinaSettimanale(pazienteAttuale, dataAttuale);
+		} catch(SQLException ex) {
+			ex.printStackTrace(); // TODO
+			return;
+		}
+		
 		/* aggiorna i dati del grafico */
-		PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelli[CostruttoreUI.INDEX_P_GRAFICO];
-		pgg.aggiornaDati(gc);
-		
+		stato.setDatiPerGrafico(gc);
+        
 		/* ottiene le statistiche e aggiorna i dati */
-		int[] stat = AnalizzatoreDiabetico.analizzaGlucosioMedio(gc);
-		PannelloGlucosio pg = (PannelloGlucosio) pannelli[CostruttoreUI.INDEX_P_GLUCOSIO];
-		pg.aggiornaDati(stat);
+		int[] statistiche = AnalizzatoreDiabetico.analizza(gc);
 		
-		stat = AnalizzatoreDiabetico.analizzaEventiGlucosioBasso(gc);
-		PannelloGlucosioBasso pgb = (PannelloGlucosioBasso) pannelli[CostruttoreUI.INDEX_P_GLUCOSIO_BASSO];
-		pgb.aggiornaDati(stat);
+		statistiche[TipoStatistica.INSULINA_LENTA.valore] = si[0];
+		statistiche[TipoStatistica.INSULINA_RAPIDA.valore] = si[1];
 		
-		/* TODO: aggiorna i dati dell'insulina */
-		PannelloInsulina pi = (PannelloInsulina) pannelli[CostruttoreUI.INDEX_P_INSULINA];
-		pi.aggiornaDati(si);
+		stato.setStatistiche(statistiche);
 	}
 	
-	private void aggiornaUI(Date data) {
+	private void aggiornaStatistiche(Date data) {
+		Date dataAttuale = stato.getDataAttuale().get();
+		
 		CalendarioSettimanale cal = new CalendarioSettimanale();
 		
 		cal.setTime(data);
 		cal.lunedi();
 		cal.resetTempoDelGiorno();
 		data = cal.getTime();
+		
 		if(data.equals(dataAttuale))
 			return;
 		
-		dataAttuale = data;
+		/* TODO: Controllare da qualche parte se la data è sensata*/
 		
-		aggiornaUI();
+		stato.setDataAttuale(data);
 	}
 	
-	private void aggiornaUI(String utente) {
-            if(utente.equals(utenteAttuale))
-                    return;
+	private void aggiornaStatistiche(String paziente) { // TODO: listener al cambio del bottone nella toggle
+		String pazienteAttuale = stato.getPazienteAttuale().get();
+		
+		if(paziente.equals(pazienteAttuale))
+				return;
 
-            utenteAttuale = utente;
+		stato.setPazienteAttuale(paziente);
 
-            try {
-                dataAttuale = GestoreDatiDiabetici.ultimaSettimana(utente);
-                aggiornaUI();
-            } catch(SQLException ex) {
-                ex.printStackTrace(); // TODO
-            }
+		try {
+			stato.setDataAttuale(GestoreDatiDiabetici.ultimaSettimana(paziente));
+		} catch(SQLException ex) {
+			ex.printStackTrace(); // TODO
+		}
 	}
         
-        public void leggiFile() {
-            RaccoltaDatiDiabetici rdd;
-            String nomeFile;
-            
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Scegli File");
-            File f = fileChooser.showOpenDialog(stage);
-            
-            if(f == null)
-                return;
-            
-            try {
-                nomeFile = f.getCanonicalPath();
-                ValidatoreXML.validaXML(nomeFile, "ril_diabete.xsd");
-            } catch (SAXException ex) {
-                ex.printStackTrace(); // getMessage();
-                return;
-            } catch (IOException ex) {
-                ex.printStackTrace(); // getMessage();
-                return;
-            }
-            
-            try(
-                FileInputStream fis = new FileInputStream(nomeFile);
-                DataInputStream dis = new DataInputStream(fis);
-                ) {
-                rdd = (RaccoltaDatiDiabetici) new XStream().fromXML(dis.readUTF());
-            } catch (IOException ex) {
-                ex.printStackTrace(); // getMessage();
-                return;
-            }
-            
-            if(GestoreDatiDiabetici.salva(rdd))
-                ;
-                
-        }
+	private void leggiFile() {
+		RaccoltaDatiDiabetici rdd;
+		String nomeFile;
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Scegli File");
+		File f = fileChooser.showOpenDialog(stage);
+
+		if(f == null)
+			return;
+
+		
+		try {
+			nomeFile = f.getCanonicalPath();
+			rdd = LettoreFileXML.leggiFileDatiGlicemici(nomeFile);
+		} catch (SAXException ex) {
+			ex.printStackTrace(); // getMessage();
+			return;
+		} catch (IOException ex) {
+			ex.printStackTrace(); // getMessage();
+			return;
+		}
+		
+		try {
+			GestoreDatiDiabetici.salva(rdd);
+			
+			String paziente = rdd.paziente;
+			Collection listaPazienti = stato.getPazienti();
+			if(!listaPazienti.contains(paziente))
+				listaPazienti.add(paziente);
+			else
+				aggiornaStatistiche(paziente);
+			
+		} catch (SQLException ex) {
+			ex.printStackTrace(); // TODO 
+		}
+
+	}
 	
 	@Override
 	public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 		RadioButton rb = (RadioButton) newValue;
-		aggiornaUI(rb.getText());
+		aggiornaStatistiche(rb.getText());
 	}
 	
 	@Override
@@ -188,7 +199,7 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 			/* TODO */
 			
 			/* TEST */
-			aggiornaUI();
+			aggiornaStatistiche();
 			return;
 		}
 		
@@ -198,34 +209,37 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 		}
 	}
 	
-	private void impostaValoriIniziali() {
-		Cache c = Cache.getValoreIniziale();
+	private void impostaListeners() {		
+		stato.getPazienteAttuale().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+			aggiornaStatistiche();
+		});
 		
-		utenteAttuale = c.getUtenteAttuale();
-		dataAttuale = c.getDataAttuale();
+		stato.getDataAttuale().addListener((ObservableValue<? extends Date> observable, Date oldValue, Date newValue) -> {
+			aggiornaStatistiche();
+		});
 		
-		setUtenteVisualizzato();
+		stato.getDatiPerGrafico().addListener((ListChangeListener.Change<? extends GlicemiaRilevata> c) -> {
+			/* TODO */
+			PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelliDati[CostruttoreUI.INDEX_P_GRAFICO];
+			pgg.aggiornaDati(stato.getDatiPerGrafico());
+		});
 		
-		PannelloGlucosio pg = (PannelloGlucosio) pannelli[CostruttoreUI.INDEX_P_GLUCOSIO];
-		pg.aggiornaDati(
-				c.getStatistica(TipoStatistica.GLUCOSIO_MEDIO),
-				c.getStatistica(TipoStatistica.GLUCOSIO_SOPRA_INTERVALLO),
-				c.getStatistica(TipoStatistica.GLUCOSIO_SOTTO_INTERVALLO));
+		stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
+			for(String paziente : change.getAddedSubList()) {
+				aggiungiPaziente(paziente);
+				stato.setPazienteAttuale(paziente);
+			}
+		});
 		
-		PannelloInsulina pi = (PannelloInsulina) pannelli[CostruttoreUI.INDEX_P_INSULINA];
-		pi.aggiornaDati(
-				c.getStatistica(TipoStatistica.INSULINA_LENTA),
-				c.getStatistica(TipoStatistica.INSULINA_RAPIDA));
+		PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelliDati[CostruttoreUI.INDEX_P_GRAFICO];
+		pgg.aggiornaDati(stato.getDatiPerGrafico());
 		
-		PannelloGlucosioBasso pgb = (PannelloGlucosioBasso) pannelli[CostruttoreUI.INDEX_P_GLUCOSIO_BASSO];
-		pgb.aggiornaDati(
-				c.getStatistica(TipoStatistica.EVENTI_GLUCOSIO_BASSO),
-				c.getStatistica(TipoStatistica.DURATA_EVENTI_GLUCOSIO_BASSO));
+		pazienti.selectedToggleProperty().addListener(this);
 		
-		PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelli[CostruttoreUI.INDEX_P_GRAFICO];
-		pgg.aggiornaDati(c.getDatiDelGrafo());
-		
-		settimanaAttuale.setText(df.format(dataAttuale));
+		leggiFile.setOnAction(this);
+		settimanaIndietro.setOnAction(this);
+		settimanaAvanti.setOnAction(this);
+		settimanaAttuale.setOnAction(this);
 	}
 	
 	private Pane creaUI() {
@@ -234,35 +248,45 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 		settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("Avanti", "settavnt");
 		settimanaAttuale = CostruttoreUI.creaCampoTesto("setttxt");
 		
-		utenti = new ToggleGroup();
+		pazienti = new ToggleGroup();
 		
-		pannelli = CostruttoreUI.creaPannelliDati(settimanaIndietro,
+		pannelliDati = CostruttoreUI.creaPannelliDati(settimanaIndietro,
 				settimanaAvanti,
 				settimanaAttuale);
 		
-		Pane contenuto = CostruttoreUI.creaUI(leggiFile, utenti, pannelli);
+		Pane contenuto = CostruttoreUI.creaUI(leggiFile, pazienti, pannelliDati);
 		
-		impostaValoriIniziali();
 		
 		/* Listeners */
-		utenti.selectedToggleProperty().addListener(this);
+		impostaListeners();
 		
-		leggiFile.setOnAction(this);
-		settimanaIndietro.setOnAction(this);
-		settimanaAvanti.setOnAction(this);
-		settimanaAttuale.setOnAction(this);
+		Collection<String> lista = stato.getPazienti();
+		
+		for(String nome : lista) {
+			aggiungiPaziente(nome);
+		}
+		
+		settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
+		aggiornaUtenteVisualizzato();
 		
 		return contenuto;
 	}
 	
 	@Override
 	public void start(Stage primaryStage) {
-            stage = primaryStage;
+        stage = primaryStage;
+		
+		try {
+			Cache cache = Cache.leggiCache();
+			StatoApplicazione.init(cache);
+		} catch(IOException | ClassNotFoundException ex) {
+			StatoApplicazione.init();
+		}
+		
+		stato = StatoApplicazione.getInstance();
+		
 		Pane root = creaUI();
 		Scene scene = new Scene(root);
-		
-		utenteAttuale = Cache.getValoreIniziale().getUtenteAttuale();
-		dataAttuale = Cache.getValoreIniziale().getDataAttuale();
 		
 		stage.setTitle("Controllo del glucosio");
 		stage.setScene(scene);
@@ -276,5 +300,10 @@ public class ApplicazioneDiabete extends Application implements ChangeListener<T
 	 */
 	public static void main(String[] args) {
 		launch(args);
+	}
+
+	private void aggiungiPaziente(String paziente) {
+		RadioButton rb = CostruttoreUI.creaBottonePaziente(paziente, "bottoneutente", pazienti);
+		CostruttoreUI.aggiungiPaziente(rb);
 	}
 }

@@ -25,7 +25,7 @@ public class GestoreDatiDiabetici {
 
     }
 
-    public static boolean salva(RaccoltaDatiDiabetici rdd) {
+    public static boolean salva(RaccoltaDatiDiabetici rdd) throws SQLException {
         /* TODO: salva nel database */
         return true;
     }
@@ -52,8 +52,8 @@ public class GestoreDatiDiabetici {
         return cs.getTime();
     }
 
-    public static StatisticaInsulina[] insulinaSettimanale(String paziente, java.util.Date data) throws SQLException {
-        StatisticaInsulina[] insulina = new StatisticaInsulina[2];
+    public static int[] insulinaSettimanale(String paziente, java.util.Date data) throws SQLException {
+		int[] insulina = new int[2];
 
         SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
 
@@ -91,16 +91,13 @@ public class GestoreDatiDiabetici {
             Statement st = co.createStatement();
         ) {
             ResultSet rs = st.executeQuery(query);
-
-            TipoInsulina tipo = TipoInsulina.fromInt(rs.getInt("tipo"));
-            int unita = rs.getInt("unita");
-            insulina[0] = new StatisticaInsulina(tipo, unita);
-
-            rs.next();
-
-            tipo = TipoInsulina.fromInt(rs.getInt("tipo"));
-            unita = rs.getInt("unita");
-            insulina[1] = new StatisticaInsulina(tipo, unita);
+			
+			while(rs.next()) {
+				if(TipoInsulina.fromInt(rs.getInt("tipo")) == TipoInsulina.INSULINA_LENTA)
+					insulina[0] = rs.getInt("unita");
+				else
+					insulina[1] = rs.getInt("unita");
+			}
         }
 
         return insulina;

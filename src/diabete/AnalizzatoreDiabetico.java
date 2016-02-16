@@ -6,6 +6,7 @@
 package diabete;
 
 import diabete.dati.GlicemiaRilevata;
+import diabete.dati.TipoStatistica;
 import java.util.*;
 
 /**
@@ -13,6 +14,21 @@ import java.util.*;
  * @author Gabriele Ara
  */
 public class AnalizzatoreDiabetico {
+
+	static int[] analizza(ArrayList<GlicemiaRilevata> gc) {
+		int[] glucosioM = analizzaGlucosioMedio(gc);
+		int[] glucosioB = analizzaEventiGlucosioBasso(gc);
+		
+		int[] statistiche = new int[TipoStatistica.NUMERO_TIPI_STATISTICHE];
+		
+		statistiche[TipoStatistica.GLUCOSIO_MEDIO.valore] = glucosioM[INDEX_GLUCOSIO_MEDIO];
+		statistiche[TipoStatistica.GLUCOSIO_SOPRA_INTERVALLO.valore] = glucosioM[INDEX_GLUCOSIO_SOPRA];
+		statistiche[TipoStatistica.GLUCOSIO_SOTTO_INTERVALLO.valore] = glucosioM[INDEX_GLUCOSIO_SOTTO];
+		statistiche[TipoStatistica.EVENTI_GLUCOSIO_BASSO.valore] = glucosioB[INDEX_NUMERO_EVENTI];
+		statistiche[TipoStatistica.DURATA_EVENTI_GLUCOSIO_BASSO.valore] = glucosioB[INDEX_DURATA_EVENTI];
+		
+		return statistiche;
+	}
 	
 	private AnalizzatoreDiabetico() {
 		
@@ -30,7 +46,7 @@ public class AnalizzatoreDiabetico {
 	
 	
 	
-	public static final int[] analizzaGlucosioMedio(Collection<GlicemiaRilevata> glicemia) {
+	private static final int[] analizzaGlucosioMedio(Collection<GlicemiaRilevata> glicemia) {
 		int media = 0, sopra = 0, sotto = 0, quanti = 0;
 		
 		for(GlicemiaRilevata gr : glicemia) {
@@ -38,14 +54,16 @@ public class AnalizzatoreDiabetico {
 			media += gr.valore;
 			
 			if(gr.valore > SOGLIA_MAX_MEDIO)
-				sopra++;
+				sopra += gr.valore;
 			if(gr.valore < SOGLIA_MIN_MEDIO)
-				sotto++;
+				sotto += gr.valore;
 		}
 		
-		media = media / quanti;
-		sopra = sopra / quanti;
-		sotto = sotto / quanti;
+		if(quanti != 0){
+			media = media / quanti;
+			sopra = sopra / quanti;
+			sotto = sotto / quanti;
+		}
 		
 		int[] statistiche = new int[3];
 		
@@ -56,7 +74,7 @@ public class AnalizzatoreDiabetico {
 		return statistiche;
 	}
 	
-	public static class ComparatoreTemporale implements Comparator<GlicemiaRilevata> {
+	private static class ComparatoreTemporale implements Comparator<GlicemiaRilevata> {
 		@Override
 		public int compare(GlicemiaRilevata o1, GlicemiaRilevata o2) {
 			if(o1.timestamp.equals(o2.timestamp))
@@ -66,14 +84,20 @@ public class AnalizzatoreDiabetico {
 		
 	}
 	
-	public static final int[] analizzaEventiGlucosioBasso(Collection<GlicemiaRilevata> glicemia) {
+	private static final int[] analizzaEventiGlucosioBasso(Collection<GlicemiaRilevata> glicemia) {
 		List<GlicemiaRilevata> lista = new ArrayList<>(glicemia);
+		int[] statistiche = new int[2];
+		
+		if(lista.size() < 1)
+			return statistiche;
+		
 		lista.sort(new ComparatoreTemporale());
 		
 		int eventi = 0;
 		long durata = 0;
 		
 		boolean bassa = false;
+		
 		Date start = lista.get(0).timestamp;
 		Date end = start;
 		
@@ -100,9 +124,10 @@ public class AnalizzatoreDiabetico {
 		if(bassa) /* evento finito */
 			durata += end.getTime() - start.getTime();
 		
-		int media = (int) ((durata / (long) eventi) / 60000);
+		int media = 0;
+		if(eventi != 0)
+			media = (int) ((durata / (long) eventi) / 60000);
 		
-		int[] statistiche = new int[2];
 		statistiche[INDEX_NUMERO_EVENTI] = eventi;
 		statistiche[INDEX_DURATA_EVENTI] = media;
 		

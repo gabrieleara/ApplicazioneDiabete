@@ -59,10 +59,12 @@ public class CalendarioSettimanale extends GregorianCalendar {
 	}
     
     public void lunedi() {
+		setFirstDayOfWeek(Calendar.MONDAY);
 		set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
     }
 	
 	public void domenica() {
+		setFirstDayOfWeek(Calendar.MONDAY);
 		set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
     }
 }
