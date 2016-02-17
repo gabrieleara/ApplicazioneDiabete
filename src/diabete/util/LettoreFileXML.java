@@ -5,10 +5,13 @@
  */
 package diabete.util;
 
-import diabete.Configurazione;
+import diabete.configurazione.Configurazione;
 import com.thoughtworks.xstream.XStream;
 import diabete.dati.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,7 +45,7 @@ public class LettoreFileXML {
     }
     
     public static RaccoltaDatiDiabetici leggiFileDatiGlicemici(String nomefile) throws SAXException, IOException {
-        validaXML(nomefile, "ril_diabete.xsd");
+        validaXML(nomefile, "rilevazioni.xsd");
         
         try(
             FileInputStream fis = new FileInputStream(nomefile);
@@ -53,13 +56,9 @@ public class LettoreFileXML {
     }
 	
 	public static Configurazione leggiFileConfigurazione(String nomefile) throws SAXException, IOException {
-		validaXML(nomefile, "conf_diabete.xsd");
-        
-        try(
-            FileInputStream fis = new FileInputStream(nomefile);
-            DataInputStream dis = new DataInputStream(fis);
-        ) {
-            return (Configurazione) new XStream().fromXML(dis.readUTF());
+		validaXML(nomefile, "configurazione.xsd");
+        byte[] contenuto = Files.readAllBytes(Paths.get(nomefile));
+        return (Configurazione) new XStream().fromXML(
+                new String(contenuto, StandardCharsets.UTF_8));
         }
-	}
 }

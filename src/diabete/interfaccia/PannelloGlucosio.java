@@ -18,10 +18,10 @@ import javafx.beans.property.SimpleIntegerProperty;
  * @TODO: AnchorPane
  */
 public class PannelloGlucosio extends javafx.scene.layout.VBox {
-	private IntegerProperty valoreMedio;
-	private IntegerProperty valoreSopra;
-	private IntegerProperty valoreDentro;
-	private IntegerProperty valoreSotto;
+	private final IntegerProperty valoreMedio;
+	private final IntegerProperty valoreSopra;
+	private final IntegerProperty valoreDentro;
+	private final IntegerProperty valoreSotto;
 	
 	public PannelloGlucosio () {
 		super();

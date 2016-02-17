@@ -5,6 +5,8 @@
  */
 package diabete;
 
+import diabete.configurazione.GestoreConfigurazione;
+import diabete.configurazione.TipoParametro;
 import diabete.dati.GlicemiaRilevata;
 import diabete.dati.TipoStatistica;
 import java.util.*;
@@ -16,6 +18,8 @@ import java.util.*;
 public class AnalizzatoreDiabetico {
 
 	static int[] analizza(ArrayList<GlicemiaRilevata> gc) {
+                SOGLIA_GLICEMIA_BASSA = (int) GestoreConfigurazione.ottieniParametro(TipoParametro.SOGLIA_GLICEMIA_ALTA);
+                SOGLIA_GLICEMIA_ALTA = (int) GestoreConfigurazione.ottieniParametro(TipoParametro.SOGLIA_GLICEMIA_BASSA);
 		int[] glucosioM = analizzaGlucosioMedio(gc);
 		int[] glucosioB = analizzaEventiGlucosioBasso(gc);
 		
@@ -34,8 +38,8 @@ public class AnalizzatoreDiabetico {
 		
 	}
 	
-	private static final int SOGLIA_MAX_MEDIO = 200;
-	private static final int SOGLIA_MIN_MEDIO = 70;
+	private static int SOGLIA_GLICEMIA_BASSA = 0;
+	private static int SOGLIA_GLICEMIA_ALTA = 0;
 	
 	public static final int INDEX_GLUCOSIO_MEDIO = 0;
 	public static final int INDEX_GLUCOSIO_SOPRA = 1;
@@ -53,9 +57,9 @@ public class AnalizzatoreDiabetico {
 			quanti++;
 			media += gr.valore;
 			
-			if(gr.valore > SOGLIA_MAX_MEDIO)
+			if(gr.valore > SOGLIA_GLICEMIA_BASSA)
 				sopra += gr.valore;
-			if(gr.valore < SOGLIA_MIN_MEDIO)
+			if(gr.valore < SOGLIA_GLICEMIA_ALTA)
 				sotto += gr.valore;
 		}
 		
@@ -103,7 +107,7 @@ public class AnalizzatoreDiabetico {
 		
 		for(int i = 0; i < lista.size(); ++i) {
 			if(bassa) {
-				if(lista.get(i).valore < SOGLIA_MIN_MEDIO) {
+				if(lista.get(i).valore < SOGLIA_GLICEMIA_ALTA) {
 					end = lista.get(i).timestamp;
 					continue;
 				}
@@ -115,7 +119,7 @@ public class AnalizzatoreDiabetico {
 			start = lista.get(i).timestamp;
 			end = start;
 			
-			if(lista.get(i).valore < SOGLIA_MIN_MEDIO) {
+			if(lista.get(i).valore < SOGLIA_GLICEMIA_ALTA) {
 				bassa = true;
 				eventi++;
 			}

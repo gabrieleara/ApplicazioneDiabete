@@ -5,6 +5,7 @@
  */
 package diabete;
 
+import diabete.configurazione.GestoreConfigurazione;
 import diabete.interfaccia.*;
 import diabete.dati.*;
 import diabete.util.*;
@@ -14,6 +15,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -261,6 +264,11 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	@Override
 	public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        try {
+            GestoreConfigurazione.init();
+        }   catch (SAXException | IOException ex) {
+                ex.printStackTrace();
+            }
 		
 		try {
 			Cache cache = Cache.leggiCache();
