@@ -15,8 +15,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -37,25 +35,11 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	 * il filechooser.
 	 */
 	private Stage primaryStage;
-	
-	/* TODO: questi in teoria non mi servono. */
-	private Button leggiFile;
-	private Button settimanaIndietro;
-	private Button settimanaAvanti;
-	
-	/* Questi recuperali con id. */
-	private TextField settimanaAttuale;
 	private ToggleGroup pazienti;
 	
 	private StatoApplicazione stato;
 	private SimpleDateFormat df = new SimpleDateFormat("dd/MM/YYYY");
-    
-	/* TODO:
-	 * vedrai non sono necessari, forse servono solo
-	 * quello del grafico e quello degli utenti.
-	 */
-	private Pane[] pannelliDati;
-	
+        
 	private void aggiornaPazienteVisualizzato() {
 		String pazienteAttuale = stato.getPazienteAttuale().get();
 		
@@ -70,6 +54,16 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 			}
 		}
 	}
+        
+        private void aggiornaGrafico() {
+            try {
+                PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico)
+                    primaryStage.sceneProperty().get().lookup("#pannello-grafico");
+                pgg.aggiornaDati(stato.getDatiPerGrafico());
+            } catch (NullPointerException ex) {
+                
+            }
+        }
 	
 	/*
 	 * @ TODO
@@ -82,6 +76,8 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		aggiornaPazienteVisualizzato();
                 
         /* TODO: imposta la data nel campo data con la bind */
+                TextField settimanaAttuale = (TextField)
+                    primaryStage.sceneProperty().get().lookup("#sett-attuale");
 		settimanaAttuale.setText(df.format(dataAttuale));
 		
 		/* ottiene valori glicemici */
@@ -179,7 +175,9 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 
 	}
 	
-	private void impostaListeners() {		
+	private void impostaListeners(Button leggiFile,
+                Button settimanaIndietro,
+                Button settimanaAvanti, TextField settimanaAttuale) {		
 		stato.getPazienteAttuale().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
 			aggiornaStatistiche();
 		});
@@ -189,11 +187,10 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		});
 		
 		stato.getDatiPerGrafico().addListener((ListChangeListener.Change<? extends GlicemiaRilevata> c) -> {
-			/* TODO */
-			PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelliDati[CostruttoreUI.INDEX_P_GRAFICO];
-			pgg.aggiornaDati(stato.getDatiPerGrafico());
+			aggiornaGrafico();
 		});
 		
+                /* TODO: testing */
 		stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
 			for(String paziente : change.getAddedSubList()) {
 				aggiungiPaziente(paziente);
@@ -206,10 +203,7 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 			aggiornaStatistiche(rb.getText());
 		});
 		
-		PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico) pannelliDati[CostruttoreUI.INDEX_P_GRAFICO];
-		pgg.aggiornaDati(stato.getDatiPerGrafico());
-		
-		leggiFile.setOnAction((ActionEvent event) -> {
+                leggiFile.setOnAction((ActionEvent event) -> {
 			leggiFile();
 		});
 		
@@ -232,22 +226,20 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	}
 	
 	private Pane creaUI() {
-		leggiFile = CostruttoreUI.creaBottoneQuadrato("Apri file", "aprifile");
-		settimanaIndietro = CostruttoreUI.creaBottoneQuadrato("Indietro", "settind");
-		settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("Avanti", "settavnt");
-		settimanaAttuale = CostruttoreUI.creaCampoTesto("setttxt");
+		Button leggiFile = CostruttoreUI.creaBottoneQuadrato("leggi-file", "Apri file", "aprifile");
+		Button settimanaIndietro = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Indietro", "settind");
+		Button settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Avanti", "settavnt");
+		TextField settimanaAttuale = CostruttoreUI.creaCampoTesto("sett-attuale", "setttxt");
 		
 		pazienti = new ToggleGroup();
 		
-		pannelliDati = CostruttoreUI.creaPannelliDati(settimanaIndietro,
-				settimanaAvanti,
-				settimanaAttuale);
-		
-		Pane contenuto = CostruttoreUI.creaUI(leggiFile, pazienti, pannelliDati);
+		Pane contenuto = CostruttoreUI.costruisciInterfaccia(leggiFile,
+                        settimanaIndietro, settimanaAvanti, settimanaAttuale,
+                        pazienti);
 		
 		
 		/* Listeners */
-		impostaListeners();
+		impostaListeners(leggiFile, settimanaIndietro, settimanaAvanti, settimanaAttuale);
 		
 		Collection<String> lista = stato.getPazienti();
 		
@@ -284,7 +276,10 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
 		primaryStage.setTitle("Controllo del glucosio");
 		primaryStage.setScene(scene);
-		primaryStage.setMinWidth(900 + 20); // TODO: per quale motivo?
+                
+                aggiornaGrafico();
+                
+                primaryStage.setMinWidth(900 + 20); // TODO: per quale motivo?
 		primaryStage.setMinHeight(500 + 40); // TODO: per quale motivo?
 		primaryStage.show();
 	}

@@ -13,36 +13,29 @@ import javafx.scene.layout.*;
  * @author Gabriele Ara
  */
 public class CostruttoreUI {
-	
-	public static final int INDEX_P_GLUCOSIO = 0;
-	public static final int INDEX_P_INSULINA = 1;
-	public static final int INDEX_P_GRAFICO = 2;
-	public static final int INDEX_P_GLUCOSIO_BASSO = 3;
-	public static final int INDEX_P_COMANDI = 4;
-	
 	private static Pane pannelloPazienti;
 
 	private CostruttoreUI() {
-		
 	}
 	
-	public static TextField creaCampoTesto(String classe) {
+	public static TextField creaCampoTesto(String id, String classe) {
 		TextField tf = new TextField();
 		tf.getStyleClass().add(classe);
+                tf.setId(id);
 		return tf;
 	}
 	
 	/*
 	 * @TODO: immagine come sfondo della classe
 	 */
-	public static final Button creaBottoneQuadrato(String testo, String classe) {
+	public static final Button creaBottoneQuadrato(String id, String testo, String classe) {
 		Button b = new Button(testo);
 		b.getStyleClass().add(classe);
 		b.setMinHeight(60.);
 		b.setMaxHeight(60.);
 		b.setMinWidth(60.);
 		b.setMaxWidth(60.);
-		
+		b.setId(id);
 		return b;
 	}
 	
@@ -69,7 +62,7 @@ public class CostruttoreUI {
 	/*
 	 * @TODO: recupera classe da impostazioni.
 	 */
-	public static Pane creaIntestazione(Button pulsante) {
+	private static Pane costruisciIntestazione(Button pulsante) {
 		AnchorPane intestazione = new AnchorPane();
 		
 		intestazione.getStyleClass().add("intestazione");
@@ -100,7 +93,7 @@ public class CostruttoreUI {
 	/*
 	 * @TODO: recupera classe da impostazioni.
 	 */
-	public static Pane creaPannelloPazienti(ToggleGroup gruppo) {
+	private static Pane costruisciPannelloPazienti(ToggleGroup gruppo) {
 		VBox pannello = new VBox();
 		pannello.getStyleClass().add("utenti");
 		
@@ -111,10 +104,8 @@ public class CostruttoreUI {
 		return pannello;
 	}
 	
-	public static Pane[] creaPannelliDati(Button b1, Button b2, TextField tf) {
-		Pane[] pannelli = new Pane[5];
-		
-		PannelloGlucosio pg = new PannelloGlucosio();
+	private static Pane costruisciPannelliContenuto(Button indietro, Button avanti, TextField data) {
+                PannelloGlucosio pg = new PannelloGlucosio();
 		pg.setMinHeight(300);
 		pg.setMinWidth(350);
 		
@@ -132,51 +123,47 @@ public class CostruttoreUI {
 		
 		pgg.setMinHeight(300);
 		pgg.setMinWidth(350);
+                pgg.setId("pannello-grafico");
 		
 		HBox comandi = new HBox();
 		
 		comandi.setMinHeight(150);
 		comandi.setMinWidth(350);
 		
-		comandi.getChildren().addAll(b1, tf, b2);
+		comandi.getChildren().addAll(indietro, data, avanti);
 		
-		pannelli[INDEX_P_GLUCOSIO] = pg;
-		pannelli[INDEX_P_INSULINA] = pi;
-		pannelli[INDEX_P_GLUCOSIO_BASSO] = pgb;
-		pannelli[INDEX_P_GRAFICO] = pgg;
-		pannelli[INDEX_P_COMANDI] = comandi;
-		
-		return pannelli;
-	}
-	
-	public static Pane creaContenuto(Pane[] pannelli) {
 		GridPane contenuto = new GridPane();
 		
 		contenuto.setMinWidth(700);
 		contenuto.setMinHeight(500 - 80);
 		
-		GridPane.setConstraints(pannelli[INDEX_P_GLUCOSIO], 0, 0, 1, 1);
-		GridPane.setConstraints(pannelli[INDEX_P_INSULINA], 0, 1, 1, 2);
-		GridPane.setConstraints(pannelli[INDEX_P_GLUCOSIO_BASSO], 1, 1, 1, 1);
-		GridPane.setConstraints(pannelli[INDEX_P_GRAFICO], 1, 0, 1, 1);
-		GridPane.setConstraints(pannelli[INDEX_P_COMANDI], 1, 2, 1, 1);
+		GridPane.setConstraints(pg, 0, 0, 1, 1);
+		GridPane.setConstraints(pi, 0, 1, 1, 2);
+		GridPane.setConstraints(pgb, 1, 1, 1, 1);
+		GridPane.setConstraints(pgg, 1, 0, 1, 1);
+		GridPane.setConstraints(comandi, 1, 2, 1, 1);
 		
-		contenuto.getChildren().addAll(java.util.Arrays.asList(pannelli));
+		contenuto.getChildren().addAll(pg, pi, pgb, pgg, comandi);
 		
 		return contenuto;
 	}
 	
-	public static Pane creaUI(Button intest, ToggleGroup gruppo, Pane[] pannelli) {
+	public static Pane costruisciInterfaccia(
+                Button aprifile,
+                Button indietro,
+                Button avanti, 
+                TextField data,
+                ToggleGroup pazienti
+        ) {
 		final BorderPane contenitore = new BorderPane();
 		
 		/* TODO: stile */
 		
-		contenitore.setTop(creaIntestazione(intest));
+		contenitore.setTop(costruisciIntestazione(aprifile));
 		
-		pannelloPazienti = creaPannelloPazienti(gruppo);
+		pannelloPazienti = costruisciPannelloPazienti(pazienti);
 		contenitore.setLeft(pannelloPazienti);
-		
-		contenitore.setCenter(creaContenuto(pannelli));
+		contenitore.setCenter(costruisciPannelliContenuto(indietro, avanti, data));
 		
 		return contenitore;
 	}

@@ -7,7 +7,6 @@ package diabete.configurazione;
 
 import com.thoughtworks.xstream.XStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -20,7 +19,7 @@ import org.xml.sax.SAXException;
  */
 public class GestoreConfigurazione {
     
-    private static Configurazione istanza;
+    private static Configurazione configurazione;
     private static final String percorso = "configurazione.xml";
     
     private GestoreConfigurazione() {
@@ -28,15 +27,15 @@ public class GestoreConfigurazione {
     
     public static void init() throws SAXException, IOException {
         try {
-            istanza = diabete.util.LettoreFileXML.leggiFileConfigurazione(percorso);
+            configurazione = diabete.util.LettoreFileXML.leggiFileConfigurazione(percorso);
         } catch (SAXException | IOException ex) {
-            istanza = new Configurazione();
+            configurazione = new Configurazione();
             throw ex;
         }
     }
     
     public static Object ottieniParametro(TipoParametro tipo) {
-        return istanza.ottieniParametro(tipo);
+        return configurazione.ottieniParametro(tipo);
     }
     
     public static void main(String[] args) {
