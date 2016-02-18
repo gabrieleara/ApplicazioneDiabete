@@ -10,10 +10,12 @@ package diabete.dati;
  * @author Gabriele Ara
  */
 public enum TipoInsulina {
-	INSULINA_RAPIDA,
-	INSULINA_LENTA;
+	INSULINA_RAPIDA(0),
+	INSULINA_LENTA(1);
 
-	public static TipoInsulina fromInt(int tipo) {
-		return TipoInsulina.values()[tipo];
+	public int valore;
+	
+	TipoInsulina(int valore) {
+		this.valore = valore;
 	}
 }

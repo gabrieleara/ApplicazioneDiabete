@@ -9,7 +9,9 @@ import diabete.configurazione.GestoreConfigurazione;
 import diabete.configurazione.TipoParametro;
 import diabete.dati.GlicemiaRilevata;
 import diabete.dati.TipoStatistica;
+import diabete.util.CalendarioSettimanale;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -17,9 +19,9 @@ import java.util.*;
  */
 public class AnalizzatoreDiabetico {
 
-	static int[] analizza(ArrayList<GlicemiaRilevata> gc) {
-                SOGLIA_GLICEMIA_BASSA = (int) GestoreConfigurazione.ottieniParametro(TipoParametro.SOGLIA_GLICEMIA_ALTA);
-                SOGLIA_GLICEMIA_ALTA = (int) GestoreConfigurazione.ottieniParametro(TipoParametro.SOGLIA_GLICEMIA_BASSA);
+	public static int[] analizza(ArrayList<GlicemiaRilevata> gc) {
+		SOGLIA_GLICEMIA_BASSA = (int) GestoreConfigurazione.ottieniParametro(TipoParametro.SOGLIA_GLICEMIA_ALTA);
+		SOGLIA_GLICEMIA_ALTA = (int) GestoreConfigurazione.ottieniParametro(TipoParametro.SOGLIA_GLICEMIA_BASSA);
 		int[] glucosioM = analizzaGlucosioMedio(gc);
 		int[] glucosioB = analizzaEventiGlucosioBasso(gc);
 		
@@ -58,15 +60,15 @@ public class AnalizzatoreDiabetico {
 			media += gr.valore;
 			
 			if(gr.valore > SOGLIA_GLICEMIA_BASSA)
-				sopra += gr.valore;
+				sopra++;
 			if(gr.valore < SOGLIA_GLICEMIA_ALTA)
-				sotto += gr.valore;
+				sotto++;
 		}
 		
 		if(quanti != 0){
 			media = media / quanti;
-			sopra = sopra / quanti;
-			sotto = sotto / quanti;
+			sopra = (sopra * 100) / quanti;
+			sotto = (sotto * 100) / quanti;
 		}
 		
 		int[] statistiche = new int[3];
@@ -136,6 +138,49 @@ public class AnalizzatoreDiabetico {
 		statistiche[INDEX_DURATA_EVENTI] = media;
 		
 		return statistiche;
+	}
+	
+	public static final Collection<GlicemiaRilevata> glicemiaMediaOraria(Collection<GlicemiaRilevata> glicemia) {
+		List<GlicemiaRilevata> lista = new ArrayList<>(glicemia);
+		
+		if(lista.size() < 1)
+			return lista;
+		
+		CalendarioSettimanale cs = new CalendarioSettimanale();
+		cs.setTime(lista.get(0).timestamp);
+		
+		cs.resetTempoDelGiorno();
+		CalendarioSettimanale attuale = new CalendarioSettimanale();
+		
+		ArrayList<GlicemiaRilevata> media = new ArrayList<>();
+		
+		do {
+			List<GlicemiaRilevata> buoni = lista.stream()
+					.filter((GlicemiaRilevata gc) -> {
+						attuale.setTime(gc.timestamp);
+						return
+								attuale.get(Calendar.HOUR_OF_DAY) == cs.get(Calendar.HOUR_OF_DAY)
+								&& attuale.get(Calendar.MINUTE) == cs.get(Calendar.MINUTE);
+					}).collect(Collectors.toList());
+			
+			// System.out.println("Guardo:\t" + cs.getTime());
+			
+			int sum = 0, num = 0;
+			
+			for(GlicemiaRilevata gr : buoni) {
+				// System.out.println("\t\t" + gr.timestamp + "\t" + gr.valore);
+				++num;
+				sum+=gr.valore;
+			}
+			
+			if(num != 0) {
+				media.add(new GlicemiaRilevata(cs.getTime(), sum/num));
+			}
+			
+			cs.add(Calendar.MINUTE, 15);
+		} while(cs.get(Calendar.HOUR_OF_DAY) != 0 || cs.get(Calendar.MINUTE) !=0);
+		
+		return media;
 	}
 	
 }

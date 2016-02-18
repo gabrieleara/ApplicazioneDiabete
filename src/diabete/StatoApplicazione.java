@@ -75,7 +75,10 @@ public class StatoApplicazione {
 		for(int i = 0; i < TipoStatistica.NUMERO_TIPI_STATISTICHE; ++i)
 			this.statistiche[i] = new SimpleIntegerProperty(0);
 		
-		this.dataAttuale = new SimpleObjectProperty<>(new Date());
+		CalendarioSettimanale cs = new CalendarioSettimanale();
+		cs.setTime(new Date());
+		cs.lunedi();
+		this.dataAttuale = new SimpleObjectProperty<>(cs.getTime());
 		
 	}
 
@@ -124,7 +127,7 @@ public class StatoApplicazione {
 		statistiche[tipo.valore].set(stat);
 	}
 
-	void setStatistiche(int[] statistiche) {
+	public void setStatistiche(int[] statistiche) {
 		for(int i = 0; i < TipoStatistica.NUMERO_TIPI_STATISTICHE; ++i)
 			this.statistiche[i].set(statistiche[i]);
 	}

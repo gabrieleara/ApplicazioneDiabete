@@ -5,8 +5,10 @@
  */
 package diabete.interfaccia;
 
+import diabete.AnalizzatoreDiabetico;
 import diabete.util.ConvertitoreTemporale;
 import diabete.dati.GlicemiaRilevata;
+import java.util.ArrayList;
 import java.util.Collection;
 import javafx.collections.*;
 import javafx.scene.chart.*;
@@ -69,6 +71,8 @@ public class PannelloGraficoGlicemico extends javafx.scene.layout.VBox {
 		Number tempo;
 		
 		datiAttuali.remove(0, datiAttuali.size());
+		
+		dati = AnalizzatoreDiabetico.glicemiaMediaOraria(dati);
 		
 		for(GlicemiaRilevata valore : dati) {
 			tempo = conv.fromDate(valore.timestamp);

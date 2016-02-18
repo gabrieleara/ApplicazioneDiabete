@@ -24,6 +24,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.xml.sax.SAXException;
 
 /**
@@ -38,7 +39,7 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	private ToggleGroup pazienti;
 	
 	private StatoApplicazione stato;
-	private SimpleDateFormat df = new SimpleDateFormat("dd/MM/YYYY");
+	private SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         
 	private void aggiornaPazienteVisualizzato() {
 		String pazienteAttuale = stato.getPazienteAttuale().get();
@@ -55,15 +56,15 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		}
 	}
         
-        private void aggiornaGrafico() {
-            try {
-                PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico)
-                    primaryStage.sceneProperty().get().lookup("#pannello-grafico");
-                pgg.aggiornaDati(stato.getDatiPerGrafico());
-            } catch (NullPointerException ex) {
-                
-            }
-        }
+	private void aggiornaGrafico() {
+		try {
+			PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico)
+				primaryStage.sceneProperty().get().lookup("#pannello-grafico");
+			pgg.aggiornaDati(stato.getDatiPerGrafico());
+		} catch (NullPointerException ex) {
+
+		}
+	}
 	
 	/*
 	 * @ TODO
@@ -120,21 +121,6 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
 		stato.setDataAttuale(data);
 	}
-	
-	private void aggiornaStatistiche(String paziente) { // TODO: listener al cambio del bottone nella toggle
-		String pazienteAttuale = stato.getPazienteAttuale().get();
-		
-		if(paziente.equals(pazienteAttuale))
-				return;
-
-		stato.setPazienteAttuale(paziente);
-
-		try {
-			stato.setDataAttuale(GestoreDatiDiabetici.ultimaSettimana(paziente));
-		} catch(SQLException ex) {
-			ex.printStackTrace(); // TODO
-		}
-	}
         
 	private void leggiFile() {
 		RaccoltaDatiDiabetici rdd;
@@ -164,10 +150,16 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 			
 			String paziente = rdd.paziente;
 			Collection listaPazienti = stato.getPazienti();
+			
 			if(!listaPazienti.contains(paziente))
 				listaPazienti.add(paziente);
-			else
-				aggiornaStatistiche(paziente);
+			
+			stato.setPazienteAttuale(paziente);
+			
+			if(rdd.rilevazioni.length > 0)
+				stato.setDataAttuale(rdd.rilevazioni[0].timestamp);
+			else if(rdd.iniezioni.length > 0)
+				stato.setDataAttuale(rdd.iniezioni[0].timestamp);
 			
 		} catch (SQLException ex) {
 			ex.printStackTrace(); // TODO 
@@ -179,6 +171,12 @@ public class ApplicazioneDiabete extends javafx.application.Application {
                 Button settimanaIndietro,
                 Button settimanaAvanti, TextField settimanaAttuale) {		
 		stato.getPazienteAttuale().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+			try {
+				stato.setDataAttuale(GestoreDatiDiabetici.ultimaSettimana(newValue));
+			} catch(SQLException ex) {
+				stato.setDataAttuale(new Date());
+				ex.printStackTrace(); // TODO
+			}
 			aggiornaStatistiche();
 		});
 		
@@ -192,15 +190,22 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
                 /* TODO: testing */
 		stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
-			for(String paziente : change.getAddedSubList()) {
-				aggiungiPaziente(paziente);
-				stato.setPazienteAttuale(paziente);
+			while(change.next()) {
+				if(change.wasAdded()) {
+					for(String paziente : change.getAddedSubList()) {
+						aggiungiPaziente(paziente);
+						stato.setPazienteAttuale(paziente);
+					}
+				}
 			}
 		});
 		
 		pazienti.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) -> {
 			RadioButton rb = (RadioButton) newValue;
-			aggiornaStatistiche(rb.getText());
+			if(!stato.getPazienteAttuale().get().equals(rb.getText())) {
+				stato.setPazienteAttuale(rb.getText());
+				//aggiornaStatistiche();
+			}
 		});
 		
                 leggiFile.setOnAction((ActionEvent event) -> {
@@ -208,11 +213,11 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		});
 		
 		settimanaIndietro.setOnAction((ActionEvent event) -> {
-			settimanaIndietro();
+			cambiaSettimana(-1);
 		});
 		
 		settimanaAvanti.setOnAction((ActionEvent event) -> {
-			settimanaAvanti();
+			cambiaSettimana(1);
 		});
 		
 		settimanaAttuale.setOnAction((ActionEvent event) -> {
@@ -248,7 +253,6 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		}
 		
 		settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
-		aggiornaPazienteVisualizzato();
 		
 		return contenuto;
 	}
@@ -276,10 +280,15 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
 		primaryStage.setTitle("Controllo del glucosio");
 		primaryStage.setScene(scene);
+		
+		primaryStage.setOnCloseRequest((WindowEvent we) -> {
+			Cache.scriviCache();
+		});
+		
+		aggiornaGrafico();
+		aggiornaPazienteVisualizzato();
                 
-                aggiornaGrafico();
-                
-                primaryStage.setMinWidth(900 + 20); // TODO: per quale motivo?
+        primaryStage.setMinWidth(900 + 20); // TODO: per quale motivo?
 		primaryStage.setMinHeight(500 + 40); // TODO: per quale motivo?
 		primaryStage.show();
 	}
@@ -296,13 +305,18 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		CostruttoreUI.aggiungiPaziente(rb);
 	}
 
-	private void settimanaIndietro() {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
-	private void settimanaAvanti() {
-		/*TODO*/
-		aggiornaStatistiche();
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	private void cambiaSettimana(int verso) {
+		CalendarioSettimanale cs = new CalendarioSettimanale();
+		cs.setTime(stato.getDataAttuale().get());
+		cs.add(Calendar.DAY_OF_MONTH, verso * 7);
+		
+		/* TODO:
+		 * controlla se esiste la data indicata,
+		 * altrimenti prendi quella direttamente più piccola/grande (dipende dal verso)
+		 * oppure ancora quella minima/massima.
+		 */
+		aggiornaStatistiche(cs.getTime());
+		// stato.setDataAttuale(cs.getTime());
+		
 	}
 }

@@ -46,19 +46,15 @@ public class LettoreFileXML {
     
     public static RaccoltaDatiDiabetici leggiFileDatiGlicemici(String nomefile) throws SAXException, IOException {
         validaXML(nomefile, "rilevazioni.xsd");
-        
-        try(
-            FileInputStream fis = new FileInputStream(nomefile);
-            DataInputStream dis = new DataInputStream(fis);
-        ) {
-            return (RaccoltaDatiDiabetici) new XStream().fromXML(dis.readUTF());
-        }
+		
+		File xmlFile = new File(nomefile);
+		return (RaccoltaDatiDiabetici) new XStream().fromXML(xmlFile);
     }
 	
 	public static Configurazione leggiFileConfigurazione(String nomefile) throws SAXException, IOException {
 		validaXML(nomefile, "configurazione.xsd");
-        byte[] contenuto = Files.readAllBytes(Paths.get(nomefile));
-        return (Configurazione) new XStream().fromXML(
-                new String(contenuto, StandardCharsets.UTF_8));
-        }
+		
+		File xmlFile = new File(nomefile);
+		return (Configurazione) new XStream().fromXML(xmlFile);
+	}
 }
