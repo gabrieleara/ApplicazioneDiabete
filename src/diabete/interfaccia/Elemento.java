@@ -25,19 +25,23 @@ public class Elemento extends AnchorPane {
 		super();
 		
 		ObservableList<Node> nodes = super.getChildren();
-		
-		setMinWidth(300);
-		setMaxWidth(300);
-		super.setMinHeight(50);
+                
+		setMinWidth(320);
+                setMaxWidth(320);
+		setMinHeight(44);
+                
+                getStyleClass().add("elemento");
 		
 		this.nome = new Label(nome);
 		this.valore = new Label();
 		this.unita = new Label(unita);
-		
+                
+                this.nome.setMaxWidth(140);
+                this.nome.setWrapText(true);
+                
 		AnchorPane.setTopAnchor(this.nome, 0.);
 		AnchorPane.setBottomAnchor(this.nome, 0.);
 		AnchorPane.setLeftAnchor(this.nome, 0.);
-		this.nome.setMaxWidth(200);
 		
 		AnchorPane.setTopAnchor(this.valore, 0.);
 		AnchorPane.setBottomAnchor(this.valore, 0.);
@@ -45,7 +49,10 @@ public class Elemento extends AnchorPane {
 		
 		/* text align right */
 		this.valore.setTextAlignment(TextAlignment.RIGHT);
-		
+		this.unita.setTextAlignment(TextAlignment.RIGHT);
+                
+                this.valore.getStyleClass().add("valore");
+                
 		AnchorPane.setTopAnchor(this.unita, 0.);
 		AnchorPane.setBottomAnchor(this.unita, 0.);
 		AnchorPane.setRightAnchor(this.unita, 0.);
@@ -62,13 +69,19 @@ public class Elemento extends AnchorPane {
 	public Elemento(String nome, String unita, String imgUrl) {
 		this(nome, unita);
 		
-		/* Add image to left */
 		/* Reduce size label */
 	}
 	
 	public void setTitolo() {
-		/* set proper class */
-		
+            this.getStyleClass().add("titolo");
+            this.getStyleClass().remove("elemento");
+            
+            if(this.unita.textProperty().get().length() > 0) {
+                AnchorPane.setRightAnchor(this.valore, 100.);
+                this.unita.setMinWidth(90.);
+                this.unita.setMaxWidth(90.);
+            } else
+                AnchorPane.setRightAnchor(this.valore, 0.);
 	}
 	
 	public void setGrassetto() {

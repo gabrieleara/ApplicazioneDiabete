@@ -1,5 +1,6 @@
 .root {
     -fx-font-size: 14px;
+    -fx-text-fill: #303030;
 }
 
 .intestazione {
@@ -7,56 +8,121 @@
 }
 
 .intestazione .label {
-    -fx-font-size: 2.7em;
+    -fx-font-size: 28px;
     -fx-text-fill: white;
 }
 
-.titolo {
-    -fx-font-size: 1.7em;
+/* UTENTI */
+
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
 }
 
 .lista-utenti {
     -fx-background-color: #0097A7;
-    
-    /*
-    -fx-border-color: gray;
-    -fx-border-insets: 0px;
-    -fx-border-width: 3px;
-    */
 }
 
 .bottoneutente {
     -fx-skin: "";
-    -fx-label-padding: 0.0em 0.0em 0.0em 4em;
+    -fx-label-padding: 0px 0px 0px 40px;
     -fx-background-image: url(../icons/user.png);
     -fx-background-position: left center;
     -fx-background-repeat: no-repeat;
-    -fx-background-size: 4em 4em;
+    -fx-background-size: 40px 40px;
     -fx-cursor: hand;
+    -fx-text-fill: white;
 }
 
-.bottonequadrato {
-    -fx-text-fill: transparent;
-    -fx-background-color: transparent;
+.bottoneutente:selected {
+    -fx-background-image: url(../icons/user-alt.png);
+    -fx-background-color: #FAFAFA;
+    -fx-text-fill: #303030;
 }
 
-#leggi-file {
-    -fx-background-image: url(../icons/addfile.png);
-    -fx-background-position: center center;
-    -fx-background-size: 3.5em 3.5em;
-    -fx-background-repeat: no-repeat;
-}
 
 .radio-button .dot,
 .radio-button .radio {
    -fx-background-color: transparent;
    -fx-background-insets: 0;
-   -fx-background-radius: 0em;
-   -fx-padding: 0em;
+   -fx-background-radius: 0px;
+   -fx-padding: 0px;
+}
+
+/* STATISTICHE */
+/* larghezza 320px altezza 220 */
+.pannello-statistica {
+    -fx-background-position: 20px 16px;
+    -fx-background-size: 40px 40px;
+    -fx-background-repeat: no-repeat;
+    -fx-padding: 16px 0px 16px 66px;
+}
+
+.pannello-glucosio-basso {
+    -fx-background-position: 42px 16px;
+    -fx-padding: 16px 22px 16px 88px;
+}
+
+.pannello-grafico {
+    -fx-padding: 16px 40px 10px 20px;
+}
+
+.titolo-grafico {
+    -fx-font-size: 18px;
+}
+
+.pannello-glucosio {
+    -fx-background-image: url(../icons/monitor.png);
+}
+
+.pannello-glucosio .titolo .valore {
+    -fx-font-weight: 700;
+    -fx-font-size: 30px;
+}
+
+.pannello-insulina {
+    -fx-background-image: url(../icons/syringe.png);
+}
+
+.pannello-glucosio-basso {
+    -fx-background-image: url(../icons/siren.png);
+}
+
+.elemento {
+    -fx-border-color: transparent transparent #B0B0B0 transparent;
+    -fx-border-width: 0px 0px 1px 0px;
+    -fx-padding: 0px 0px 0px 0px;
+}
+
+.pannello-statistica .titolo {
+    -fx-border-color: transparent transparent #040404 transparent;
+    -fx-border-width: 0px 0px 1px 0px;
+    -fx-font-size: 17px;
+}
+
+.pannello-comandi,
+.messaggio {
+     -fx-alignment: center;
 }
 
 
-.radio-button:selected {
-    -fx-background-image: url(../icons/user-alt.png);
-    -fx-background-color: #FAFAFA;
+/* BOTTONI */
+.bottonequadrato {
+    -fx-text-fill: transparent;
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-background-position: center center;
+    -fx-background-size: 40px 40px;
+    -fx-background-repeat: no-repeat;
+}
+
+#leggi-file {
+    -fx-background-image: url(../icons/addfile.png);
+}
+
+#sett-avanti {
+    -fx-background-image: url(../icons/right.png);
+}
+
+#sett-indietro {
+    -fx-background-image: url(../icons/left.png);
 }

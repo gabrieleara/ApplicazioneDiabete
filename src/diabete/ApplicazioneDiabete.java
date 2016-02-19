@@ -251,7 +251,7 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	private Pane creaUI() {
 		Button leggiFile = CostruttoreUI.creaBottoneQuadrato("leggi-file", "Apri file", "bottonequadrato");
 		Button settimanaIndietro = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Indietro", "bottonequadrato");
-		Button settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Avanti", "bottonequadrato");
+		Button settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("sett-avanti", "Avanti", "bottonequadrato");
 		TextField settimanaAttuale = CostruttoreUI.creaCampoTesto("sett-attuale", "setttxt");
                 Label errore = CostruttoreUI.creaEtichetta("errore", "errmsg");
                 
@@ -311,8 +311,8 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		aggiornaGrafico();
 		aggiornaPazienteVisualizzato();
                 
-        primaryStage.setMinWidth(900 + 20); // TODO: per quale motivo?
-		primaryStage.setMinHeight(500 + 40); // TODO: per quale motivo?
+        primaryStage.setMinWidth(930 + 20); // TODO: per quale motivo?
+		primaryStage.setMinHeight(545); // TODO: per quale motivo?
 		primaryStage.show();
 	}
 

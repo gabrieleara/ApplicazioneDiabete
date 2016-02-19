@@ -34,7 +34,7 @@ public class PannelloGraficoGlicemico extends javafx.scene.layout.VBox {
 		this.conv = new ConvertitoreTemporale();
 		this.datiAttuali = FXCollections.observableArrayList();
 		Label titolo = new Label("Valore medio del glucosio");
-		/* stile */
+		titolo.getStyleClass().add("titolografico");
 		super.getChildren().add(titolo);
 		
 		ObservableList<XYChart.Series<Number, Number>> serie = FXCollections.observableArrayList();
@@ -59,9 +59,7 @@ public class PannelloGraficoGlicemico extends javafx.scene.layout.VBox {
 		orario.setMinorTickCount(4);
 		
 		XYChart<Number, Number> lineChart = new LineChart(orario, valore, serie);
-		
-		
-		lineChart.setMaxHeight(250);
+		lineChart.maxHeightProperty().bind(this.maxHeightProperty());
 		
 		super.getChildren().add(lineChart);
 	}
