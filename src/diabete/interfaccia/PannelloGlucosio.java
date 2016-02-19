@@ -15,7 +15,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 /**
  *
  * @author Gabriele Ara
- * @TODO: AnchorPane
  */
 public class PannelloGlucosio extends javafx.scene.layout.VBox {
 	private final IntegerProperty valoreMedio;

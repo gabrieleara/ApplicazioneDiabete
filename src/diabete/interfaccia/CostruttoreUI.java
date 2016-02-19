@@ -15,10 +15,17 @@ import javafx.scene.layout.*;
 public class CostruttoreUI {
 	private static Pane pannelloPazienti;
 
-	private CostruttoreUI() {
+    	private CostruttoreUI() {
 	}
 	
-	public static TextField creaCampoTesto(String id, String classe) {
+        public static Label creaEtichetta(String id, String classe) {
+                Label label = new Label();
+		label.getStyleClass().add(classe);
+                label.setId(id);
+		return label;
+        }
+	
+        public static TextField creaCampoTesto(String id, String classe) {
 		TextField tf = new TextField();
 		tf.getStyleClass().add(classe);
                 tf.setId(id);
@@ -72,7 +79,7 @@ public class CostruttoreUI {
 		
 		intestazione.setMinWidth(900);
 		
-		Label titolo = new Label("Controllo del glucosio");
+		Label titolo = new Label("Controllo del Glucosio");
 		
 		AnchorPane.setTopAnchor(titolo, 10.0);
 		AnchorPane.setBottomAnchor(titolo, 10.0);
@@ -95,7 +102,7 @@ public class CostruttoreUI {
 	 */
 	private static Pane costruisciPannelloPazienti(ToggleGroup gruppo) {
 		VBox pannello = new VBox();
-		pannello.getStyleClass().add("utenti");
+		pannello.getStyleClass().add("lista-utenti");
 		
 		pannello.setMinWidth(200);
 		pannello.setMaxWidth(200);
@@ -104,7 +111,7 @@ public class CostruttoreUI {
 		return pannello;
 	}
 	
-	private static Pane costruisciPannelliContenuto(Button indietro, Button avanti, TextField data) {
+	private static Pane costruisciPannelliContenuto(Button indietro, Button avanti, TextField data, Label errore) {
                 PannelloGlucosio pg = new PannelloGlucosio();
 		pg.setMinHeight(300);
 		pg.setMinWidth(350);
@@ -129,8 +136,9 @@ public class CostruttoreUI {
 		
 		comandi.setMinHeight(150);
 		comandi.setMinWidth(350);
-		
-		comandi.getChildren().addAll(indietro, data, avanti);
+                
+                Label l = new Label("Settimana dal ");
+		comandi.getChildren().addAll(indietro, l, data, avanti);
 		
 		GridPane contenuto = new GridPane();
 		
@@ -138,12 +146,14 @@ public class CostruttoreUI {
 		contenuto.setMinHeight(500 - 80);
 		
 		GridPane.setConstraints(pg, 0, 0, 1, 1);
-		GridPane.setConstraints(pi, 0, 1, 1, 2);
+		GridPane.setConstraints(pi, 0, 1, 1, 3);
 		GridPane.setConstraints(pgb, 1, 1, 1, 1);
 		GridPane.setConstraints(pgg, 1, 0, 1, 1);
 		GridPane.setConstraints(comandi, 1, 2, 1, 1);
+                
+                GridPane.setConstraints(errore, 1, 3, 1, 1);
 		
-		contenuto.getChildren().addAll(pg, pi, pgb, pgg, comandi);
+		contenuto.getChildren().addAll(pg, pi, pgb, pgg, comandi, errore);
 		
 		return contenuto;
 	}
@@ -153,7 +163,8 @@ public class CostruttoreUI {
                 Button indietro,
                 Button avanti, 
                 TextField data,
-                ToggleGroup pazienti
+                ToggleGroup pazienti,
+                Label errore
         ) {
 		final BorderPane contenitore = new BorderPane();
 		
@@ -163,7 +174,7 @@ public class CostruttoreUI {
 		
 		pannelloPazienti = costruisciPannelloPazienti(pazienti);
 		contenitore.setLeft(pannelloPazienti);
-		contenitore.setCenter(costruisciPannelliContenuto(indietro, avanti, data));
+		contenitore.setCenter(costruisciPannelliContenuto(indietro, avanti, data, errore));
 		
 		return contenitore;
 	}

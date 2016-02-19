@@ -44,7 +44,6 @@ public class RaccoltaDatiDiabetici {
 		Date settimana = null;
 		String pazienteSim = null;
 		
-		/* TODO */
 		try {
 			byte[] encoded = Files.readAllBytes(Paths.get("args.txt"));
 			Pattern p = Pattern.compile("(.+),(.+)");
@@ -140,7 +139,9 @@ public class RaccoltaDatiDiabetici {
 			ii.add(new IniezioneInsulina(TipoInsulina.INSULINA_LENTA, cs.getTime(), (int) Math.floor(Math.random() * 3 + 6)));
 			
 			if(Math.random() > 0.2)
-				ii.add(new IniezioneInsulina(TipoInsulina.INSULINA_RAPIDA, cs.getTime(), (int) Math.floor(Math.random() * 3)));
+				ii.add(new IniezioneInsulina(TipoInsulina.INSULINA_RAPIDA, cs.getTime(), (int) Math.floor(Math.random() * 3 + 2)));
+                        else
+                            ii.add(new IniezioneInsulina(TipoInsulina.INSULINA_RAPIDA, cs.getTime(), 2));
 			
 			cs.add(Calendar.DAY_OF_MONTH, 1);
 		}

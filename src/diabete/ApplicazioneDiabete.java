@@ -12,9 +12,9 @@ import diabete.util.*;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
+import javafx.beans.property.*;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -22,9 +22,7 @@ import javafx.event.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import org.xml.sax.SAXException;
 
 /**
@@ -39,7 +37,8 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	private ToggleGroup pazienti;
 	
 	private StatoApplicazione stato;
-	private SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        private final StringProperty messaggio = new SimpleStringProperty();
+	private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         
 	private void aggiornaPazienteVisualizzato() {
 		String pazienteAttuale = stato.getPazienteAttuale().get();
@@ -60,15 +59,12 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		try {
 			PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico)
 				primaryStage.sceneProperty().get().lookup("#pannello-grafico");
-			pgg.aggiornaDati(stato.getDatiPerGrafico());
+			pgg.aggiornaDati(AnalizzatoreDiabetico.glicemiaMediaOraria(stato.getDatiPerGrafico()));
 		} catch (NullPointerException ex) {
 
 		}
 	}
 	
-	/*
-	 * @ TODO
-	 */
 	private void aggiornaStatistiche() {
 		String pazienteAttuale = stato.getPazienteAttuale().get();
 		Date dataAttuale = stato.getDataAttuale().get();
@@ -76,8 +72,7 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		/* imposta utente nel gruppo */
 		aggiornaPazienteVisualizzato();
                 
-        /* TODO: imposta la data nel campo data con la bind */
-                TextField settimanaAttuale = (TextField)
+        TextField settimanaAttuale = (TextField)
                     primaryStage.sceneProperty().get().lookup("#sett-attuale");
 		settimanaAttuale.setText(df.format(dataAttuale));
 		
@@ -85,10 +80,10 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		ArrayList<GlicemiaRilevata> gc;
 		int[] si;
 		try {
-		    gc = GestoreDatiDiabetici.glicemiaSettimanale(pazienteAttuale, dataAttuale);
+                        gc = GestoreDatiDiabetici.glicemiaSettimanale(pazienteAttuale, dataAttuale);
 			si = GestoreDatiDiabetici.insulinaSettimanale(pazienteAttuale, dataAttuale);
 		} catch(SQLException ex) {
-			ex.printStackTrace(); // TODO
+			messaggio.set("Errore nel recupero dati dal database!");
 			return;
 		}
 		
@@ -111,15 +106,24 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
 		cal.setTime(data);
 		cal.lunedi();
-		cal.resetTempoDelGiorno();
+                cal.resetTempoDelGiorno();
 		data = cal.getTime();
 		
 		if(data.equals(dataAttuale))
 			return;
-		
-		/* TODO: Controllare da qualche parte se la data è sensata*/
-		
-		stato.setDataAttuale(data);
+                
+                cal.add(Calendar.DAY_OF_MONTH, 7);
+                data = cal.getTime();
+            try {
+                data =
+                        GestoreDatiDiabetici.settimanaIndietro(
+                                stato.getPazienteAttuale().get(),
+                                data);
+            } catch (SQLException ex) {
+                ex.printStackTrace(); // todo
+            }
+            
+            stato.setDataAttuale(data);
 	}
         
 	private void leggiFile() {
@@ -158,8 +162,10 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 			
 			if(rdd.rilevazioni.length > 0)
 				stato.setDataAttuale(rdd.rilevazioni[0].timestamp);
-			else if(rdd.iniezioni.length > 0)
+			/* todo
+                            else if(rdd.iniezioni.length > 0)
 				stato.setDataAttuale(rdd.iniezioni[0].timestamp);
+                        */
 			
 		} catch (SQLException ex) {
 			ex.printStackTrace(); // TODO 
@@ -188,13 +194,11 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 			aggiornaGrafico();
 		});
 		
-                /* TODO: testing */
-		stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
+                stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
 			while(change.next()) {
 				if(change.wasAdded()) {
 					for(String paziente : change.getAddedSubList()) {
 						aggiungiPaziente(paziente);
-						stato.setPazienteAttuale(paziente);
 					}
 				}
 			}
@@ -213,11 +217,25 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		});
 		
 		settimanaIndietro.setOnAction((ActionEvent event) -> {
-			cambiaSettimana(-1);
+                    try {
+                        stato.setDataAttuale(
+                                GestoreDatiDiabetici.settimanaIndietro(
+                                        stato.getPazienteAttuale().get(),
+                                        stato.getDataAttuale().get()));
+                    } catch (SQLException ex) {
+                        ex.printStackTrace(); // TODO
+                    }
 		});
 		
 		settimanaAvanti.setOnAction((ActionEvent event) -> {
-			cambiaSettimana(1);
+                    try {
+                        stato.setDataAttuale(
+                                GestoreDatiDiabetici.settimanaAvanti(
+                                        stato.getPazienteAttuale().get(),
+                                        stato.getDataAttuale().get()));
+                    } catch (SQLException ex) {
+                        ex.printStackTrace(); // TODO
+                    }
 		});
 		
 		settimanaAttuale.setOnAction((ActionEvent event) -> {
@@ -231,16 +249,19 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	}
 	
 	private Pane creaUI() {
-		Button leggiFile = CostruttoreUI.creaBottoneQuadrato("leggi-file", "Apri file", "aprifile");
-		Button settimanaIndietro = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Indietro", "settind");
-		Button settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Avanti", "settavnt");
+		Button leggiFile = CostruttoreUI.creaBottoneQuadrato("leggi-file", "Apri file", "bottonequadrato");
+		Button settimanaIndietro = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Indietro", "bottonequadrato");
+		Button settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Avanti", "bottonequadrato");
 		TextField settimanaAttuale = CostruttoreUI.creaCampoTesto("sett-attuale", "setttxt");
+                Label errore = CostruttoreUI.creaEtichetta("errore", "errmsg");
+                
+                errore.textProperty().bind(messaggio);
 		
 		pazienti = new ToggleGroup();
 		
 		Pane contenuto = CostruttoreUI.costruisciInterfaccia(leggiFile,
                         settimanaIndietro, settimanaAvanti, settimanaAttuale,
-                        pazienti);
+                        pazienti, errore);
 		
 		
 		/* Listeners */
@@ -277,6 +298,8 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
 		Pane root = creaUI();
 		Scene scene = new Scene(root);
+                
+                scene.getStylesheets().add("res/styles/style.css");
 		
 		primaryStage.setTitle("Controllo del glucosio");
 		primaryStage.setScene(scene);
@@ -303,20 +326,5 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	private void aggiungiPaziente(String paziente) {
 		RadioButton rb = CostruttoreUI.creaBottonePaziente(paziente, "bottoneutente", pazienti);
 		CostruttoreUI.aggiungiPaziente(rb);
-	}
-
-	private void cambiaSettimana(int verso) {
-		CalendarioSettimanale cs = new CalendarioSettimanale();
-		cs.setTime(stato.getDataAttuale().get());
-		cs.add(Calendar.DAY_OF_MONTH, verso * 7);
-		
-		/* TODO:
-		 * controlla se esiste la data indicata,
-		 * altrimenti prendi quella direttamente più piccola/grande (dipende dal verso)
-		 * oppure ancora quella minima/massima.
-		 */
-		aggiornaStatistiche(cs.getTime());
-		// stato.setDataAttuale(cs.getTime());
-		
 	}
 }

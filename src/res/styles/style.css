@@ -1,0 +1,62 @@
+.root {
+    -fx-font-size: 14px;
+}
+
+.intestazione {
+    -fx-background-color: #00BCD4;
+}
+
+.intestazione .label {
+    -fx-font-size: 2.7em;
+    -fx-text-fill: white;
+}
+
+.titolo {
+    -fx-font-size: 1.7em;
+}
+
+.lista-utenti {
+    -fx-background-color: #0097A7;
+    
+    /*
+    -fx-border-color: gray;
+    -fx-border-insets: 0px;
+    -fx-border-width: 3px;
+    */
+}
+
+.bottoneutente {
+    -fx-skin: "";
+    -fx-label-padding: 0.0em 0.0em 0.0em 4em;
+    -fx-background-image: url(../icons/user.png);
+    -fx-background-position: left center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 4em 4em;
+    -fx-cursor: hand;
+}
+
+.bottonequadrato {
+    -fx-text-fill: transparent;
+    -fx-background-color: transparent;
+}
+
+#leggi-file {
+    -fx-background-image: url(../icons/addfile.png);
+    -fx-background-position: center center;
+    -fx-background-size: 3.5em 3.5em;
+    -fx-background-repeat: no-repeat;
+}
+
+.radio-button .dot,
+.radio-button .radio {
+   -fx-background-color: transparent;
+   -fx-background-insets: 0;
+   -fx-background-radius: 0em;
+   -fx-padding: 0em;
+}
+
+
+.radio-button:selected {
+    -fx-background-image: url(../icons/user-alt.png);
+    -fx-background-color: #FAFAFA;
+}

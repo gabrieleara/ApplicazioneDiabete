@@ -15,12 +15,11 @@ import javafx.beans.property.SimpleIntegerProperty;
 /**
  *
  * @author Gabriele Ara
- * @TODO: AnchorPane
  */
 public class PannelloInsulina extends javafx.scene.layout.VBox {
-	private IntegerProperty azioneRapida;
-	private IntegerProperty azioneLenta;
-	private IntegerProperty totale;
+	private final IntegerProperty azioneRapida;
+	private final IntegerProperty azioneLenta;
+	private final IntegerProperty totale;
 	
 	public PannelloInsulina () {
 		super();
