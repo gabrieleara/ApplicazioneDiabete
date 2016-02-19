@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.TextAlignment;
 
 /**
@@ -21,45 +22,64 @@ public class Elemento extends AnchorPane {
 	private Label valore;
 	private Label unita;
 	
+	private Pane riga;
+	
 	public Elemento(String nome, String unita) {
 		super();
 		
 		ObservableList<Node> nodes = super.getChildren();
                 
-		setMinWidth(320);
-                setMaxWidth(320);
+		setMinWidth(280);
+        setMaxWidth(280);
 		setMinHeight(44);
                 
-                getStyleClass().add("elemento");
+		getStyleClass().add("elemento");
 		
 		this.nome = new Label(nome);
 		this.valore = new Label();
 		this.unita = new Label(unita);
-                
-                this.nome.setMaxWidth(140);
-                this.nome.setWrapText(true);
-                
-		AnchorPane.setTopAnchor(this.nome, 0.);
-		AnchorPane.setBottomAnchor(this.nome, 0.);
-		AnchorPane.setLeftAnchor(this.nome, 0.);
+        
+		this.riga = new Pane();
 		
-		AnchorPane.setTopAnchor(this.valore, 0.);
-		AnchorPane.setBottomAnchor(this.valore, 0.);
-		AnchorPane.setRightAnchor(this.valore, 60.);
+		this.riga.setMinWidth(230);
+		this.riga.setMaxWidth(230);
+		
+		this.riga.setMinHeight(1);
+		this.riga.setMaxHeight(1);
+		
+		this.nome.setMaxWidth(250);
+		this.nome.setWrapText(true);
+                
+		AnchorPane.setTopAnchor(this.nome, 10.);
+		AnchorPane.setBottomAnchor(this.nome, 10.);
+		AnchorPane.setLeftAnchor(this.nome, 10.);
+		
+		AnchorPane.setTopAnchor(this.valore, 10.);
+		AnchorPane.setBottomAnchor(this.valore, 10.);
+		AnchorPane.setRightAnchor(this.valore, 55.);
 		
 		/* text align right */
 		this.valore.setTextAlignment(TextAlignment.RIGHT);
 		this.unita.setTextAlignment(TextAlignment.RIGHT);
                 
-                this.valore.getStyleClass().add("valore");
+		this.valore.getStyleClass().add("valore");
                 
-		AnchorPane.setTopAnchor(this.unita, 0.);
-		AnchorPane.setBottomAnchor(this.unita, 0.);
+		AnchorPane.setTopAnchor(this.unita, 10.);
+		AnchorPane.setBottomAnchor(this.unita, 10.);
 		AnchorPane.setRightAnchor(this.unita, 0.);
+		
 		this.unita.setMaxWidth(50);
 		this.unita.setMinWidth(50);
 		
-		nodes.addAll(this.nome, this.valore, this.unita);
+		this.unita.setWrapText(true);
+		this.unita.getStyleClass().add("unita");
+		
+		AnchorPane.setBottomAnchor(this.riga, 0.);
+		AnchorPane.setLeftAnchor(this.riga, 0.);
+		
+		this.riga.getStyleClass().add("riga");
+		
+		nodes.addAll(this.nome, this.valore, this.unita, this.riga);
 	}
 	
 	public StringProperty getValoreProperty() {
@@ -69,23 +89,27 @@ public class Elemento extends AnchorPane {
 	public Elemento(String nome, String unita, String imgUrl) {
 		this(nome, unita);
 		
-		/* Reduce size label */
+		this.nome.setMaxWidth(190);
+		AnchorPane.setLeftAnchor(this.nome, 40.);
+		
+		getStyleClass().add(imgUrl);
 	}
 	
 	public void setTitolo() {
             this.getStyleClass().add("titolo");
             this.getStyleClass().remove("elemento");
+			
+			this.riga.setMinWidth(275);
+			this.riga.setMaxWidth(275);
             
-            if(this.unita.textProperty().get().length() > 0) {
-                AnchorPane.setRightAnchor(this.valore, 100.);
-                this.unita.setMinWidth(90.);
-                this.unita.setMaxWidth(90.);
-            } else
-                AnchorPane.setRightAnchor(this.valore, 0.);
+            if(this.unita.textProperty().get().length() < 1) 
+                AnchorPane.setRightAnchor(this.valore, 20.);
 	}
 	
 	public void setGrassetto() {
-		/* set proper class */
-		/* all caps */
+		String s = this.nome.getText().toUpperCase();
+		this.nome.setText(s);
+		this.nome.setMaxWidth(130);
+		getStyleClass().add("grassetto");
 	}
 }

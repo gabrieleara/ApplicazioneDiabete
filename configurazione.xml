@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <diabete.configurazione.Configurazione>
 	<stile>
-		<percorsoCss>stile.css</percorsoCss>
+		<percorsoCss>res/styles/style.css</percorsoCss>
 		<nomeFont>sans-serif</nomeFont>
 		<coloreIntestazione>#00BCD4</coloreIntestazione>
 		<colorePannelloUtenti>#0097A7</colorePannelloUtenti>
-		<coloreUtenteSelezionato>#727272</coloreUtenteSelezionato>
+		<coloreUtenteSelezionato>#FAFAFA</coloreUtenteSelezionato>
 		<coloreLineaGrafico>#607D8B</coloreLineaGrafico>
 		<coloreSfondoGrafico>#B6B6B6</coloreSfondoGrafico>
 	</stile>

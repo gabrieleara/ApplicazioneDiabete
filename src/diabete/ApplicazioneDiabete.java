@@ -6,6 +6,7 @@
 package diabete;
 
 import diabete.configurazione.GestoreConfigurazione;
+import diabete.configurazione.TipoParametro;
 import diabete.interfaccia.*;
 import diabete.dati.*;
 import diabete.util.*;
@@ -45,12 +46,17 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
 		ObservableList<Toggle> bottoni = pazienti.getToggles();
 		
+		String color = (String) GestoreConfigurazione.ottieniParametro(TipoParametro.COLORE_UTENTE_SELEZIONATO);
+		
 		for (Iterator<Toggle> it = bottoni.iterator(); it.hasNext();) {
 			RadioButton utente = (RadioButton) it.next();
 			if(utente.getText().equals(pazienteAttuale)) {
 				utente.setSelected(true);
 				utente.requestFocus();
-				break;
+				
+				utente.setStyle("-fx-background-color: " + color + ";");
+			} else {
+				utente.setStyle("-fx-background-color: transparent;");
 			}
 		}
 	}
@@ -299,7 +305,11 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		Pane root = creaUI();
 		Scene scene = new Scene(root);
                 
-                scene.getStylesheets().add("res/styles/style.css");
+        scene.getStylesheets().add((String) 
+				GestoreConfigurazione.ottieniParametro(TipoParametro.PERCORSO_CSS));
+		
+		String nomeFont = (String) GestoreConfigurazione.ottieniParametro(TipoParametro.NOME_FONT);
+		root.setStyle("-fx-font-family: " + nomeFont);
 		
 		primaryStage.setTitle("Controllo del glucosio");
 		primaryStage.setScene(scene);
@@ -311,8 +321,8 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		aggiornaGrafico();
 		aggiornaPazienteVisualizzato();
                 
-        primaryStage.setMinWidth(930 + 20); // TODO: per quale motivo?
-		primaryStage.setMinHeight(545); // TODO: per quale motivo?
+        primaryStage.setMinWidth(1030);
+		primaryStage.setMinHeight(645);
 		primaryStage.show();
 	}
 

@@ -5,6 +5,8 @@
  */
 package diabete.interfaccia;
 
+import diabete.configurazione.GestoreConfigurazione;
+import diabete.configurazione.TipoParametro;
 import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.*;
@@ -19,17 +21,18 @@ public class CostruttoreUI {
     	private CostruttoreUI() {
 	}
 	
-        public static Label creaEtichetta(String id, String classe) {
-                Label label = new Label();
+	public static Label creaEtichetta(String id, String classe) {
+		Label label = new Label();
 		label.getStyleClass().add(classe);
-                label.setId(id);
+		
+		label.setId(id);
 		return label;
-        }
+	}
 	
-        public static TextField creaCampoTesto(String id, String classe) {
+	public static TextField creaCampoTesto(String id, String classe) {
 		TextField tf = new TextField();
 		tf.getStyleClass().add(classe);
-                tf.setId(id);
+		tf.setId(id);
 		return tf;
 	}
 	
@@ -54,11 +57,11 @@ public class CostruttoreUI {
 	public static RadioButton creaBottonePaziente(String nome, String classe, ToggleGroup gruppo) {
 		RadioButton rb = new RadioButton(nome);
 		rb.getStyleClass().add(classe);
-                
-                rb.setMinHeight(50);
-                rb.setMaxWidth(180 - 40);
-                
-                rb.setWrapText(true);
+		
+		rb.setMinHeight(50);
+		rb.setMaxWidth(180 - 40);
+		
+		rb.setWrapText(true);
 		
 		rb.setToggleGroup(gruppo);
 		
@@ -66,11 +69,11 @@ public class CostruttoreUI {
 	}
 	
 	public static void aggiungiPaziente(ToggleButton paziente) {
-            paziente.setMaxWidth(180);
-            paziente.setMinWidth(180);
-            paziente.setMinHeight(40);
-            paziente.setWrapText(true);
-            pannelloPazienti.getChildren().add(paziente);
+		paziente.setMaxWidth(180);
+		paziente.setMinWidth(180);
+		paziente.setMinHeight(40);
+		paziente.setWrapText(true);
+		pannelloPazienti.getChildren().add(paziente);
 	}
 	
 	/*
@@ -80,6 +83,9 @@ public class CostruttoreUI {
 		AnchorPane intestazione = new AnchorPane();
 		
 		intestazione.getStyleClass().add("intestazione");
+		
+		String color = (String) GestoreConfigurazione.ottieniParametro(TipoParametro.COLORE_INTESTAZIONE);
+		intestazione.setStyle("-fx-background-color: " + color);
 		
 		intestazione.setMinHeight(50.);
 		intestazione.setMaxHeight(50.);
@@ -110,45 +116,44 @@ public class CostruttoreUI {
 	private static Pane costruisciPannelloPazienti(ToggleGroup gruppo) {
 		VBox pannello = new VBox();
 		
-                pannello.setMinWidth(180);
+		pannello.setMinWidth(180);
 		pannello.setMaxWidth(180);
-		
 		
 		return pannello;
 	}
 	
 	private static Pane costruisciPannelliContenuto(Button indietro, Button avanti, TextField data, Label errore) {
-                PannelloGlucosio pg = new PannelloGlucosio();
-		pg.setMinHeight(220 - 32);
+		PannelloGlucosio pg = new PannelloGlucosio();
+		pg.setMinHeight(320 - 32);
 		pg.setMinWidth(320 - 66);
-                pg.getStyleClass().add("pannello-statistica");
-                pg.getStyleClass().add("pannello-glucosio");
+		pg.getStyleClass().add("pannello-statistica");
+		pg.getStyleClass().add("pannello-glucosio");
 		
 		PannelloInsulina pi = new PannelloInsulina();
 		pi.setMinHeight(240 - 32);
 		pi.setMinWidth(320 - 66);
-                pi.getStyleClass().add("pannello-statistica");
-                pi.getStyleClass().add("pannello-insulina");
+		pi.getStyleClass().add("pannello-statistica");
+		pi.getStyleClass().add("pannello-insulina");
 		
 		PannelloGlucosioBasso pgb = new PannelloGlucosioBasso();
 		pgb.setMinHeight(120 - 32);
 		pgb.setMinWidth(430 - 66);
-                pgb.getStyleClass().add("pannello-statistica");
-                pgb.getStyleClass().add("pannello-glucosio-basso");
+		pgb.getStyleClass().add("pannello-statistica");
+		pgb.getStyleClass().add("pannello-glucosio-basso");
 		
 		PannelloGraficoGlicemico pgg = new PannelloGraficoGlicemico();
-		pgg.setMinHeight(220 - 26); /**/
-                pgg.setMaxHeight(220 - 26);
-		pgg.setMinWidth(420 - 60);
-                pgg.setMaxWidth(420 - 60);
-                pgg.setId("pannello-grafico");
+		pgg.setMinHeight(320 - 26);
+		pgg.setMaxHeight(320 - 26);
+		pgg.setMinWidth(530 - 32);
+		pgg.setMaxWidth(530 - 32);
+		pgg.setId("pannello-grafico");
 		
 		HBox comandi = new HBox();
 		comandi.setMinHeight(120);
 		comandi.setMinWidth(430);
-                comandi.getStyleClass().add("pannello-comandi");
-                
-                Label l = new Label("Settimana dal ");
+		comandi.getStyleClass().add("pannello-comandi");
+
+		Label l = new Label("Settimana dal ");
 		comandi.getChildren().addAll(indietro, l, data, avanti);
 		
 		GridPane contenuto = new GridPane();
@@ -188,10 +193,10 @@ public class CostruttoreUI {
                 sp.setHbarPolicy(ScrollBarPolicy.NEVER);
                 sp.setVbarPolicy(ScrollBarPolicy.NEVER);
                 sp.setMinWidth(180);
-		sp.setMaxWidth(180);
-                sp.setMaxHeight(460);
-                sp.setMinHeight(460);
+				sp.setMaxWidth(180);
                 sp.getStyleClass().add("lista-utenti");
+				String color = (String) GestoreConfigurazione.ottieniParametro(TipoParametro.COLORE_PANNELLO_UTENTI);
+				sp.setStyle("-fx-background-color: " + color);
                 
                 sp.minHeight(pannelloPazienti.minHeightProperty().get());
                 sp.minWidth(pannelloPazienti.minWidthProperty().get());
