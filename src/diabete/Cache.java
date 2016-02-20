@@ -35,16 +35,14 @@ public class Cache implements java.io.Serializable {
 		return c;
     }
 
-    public static void scriviCache() {
+    public static void scriviCache() throws IOException {
 		Cache c = new Cache(StatoApplicazione.getInstance());
         try (
             FileOutputStream fos = new FileOutputStream(cacheFileName);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
            oos.writeObject(c);
-        } catch (IOException ex) {
-           ex.printStackTrace(); /* TODO */
-        }
+		}
     }
 	
 	private Cache(StatoApplicazione stato) {
@@ -133,31 +131,13 @@ public class Cache implements java.io.Serializable {
 		
 		stato.setDatiPerGrafico(datiDelGrafo);
 		
-		scriviCache();
-		
-        /*
-		Cache cache = new Cache(datiDelGrafo, utenti, "Annalisa Gioli",
-                        c.getTime());
-
-        cache.setStatistica(132, TipoStatistica.GLUCOSIO_MEDIO);
-        cache.setStatistica(26, TipoStatistica.GLUCOSIO_SOPRA_INTERVALLO);
-        cache.setStatistica(15, TipoStatistica.GLUCOSIO_SOTTO_INTERVALLO);
-        cache.setStatistica(1, TipoStatistica.INSULINA_LENTA);
-        cache.setStatistica(11, TipoStatistica.INSULINA_RAPIDA);
-        cache.setStatistica(11, TipoStatistica.EVENTI_GLUCOSIO_BASSO);
-        cache.setStatistica(124, TipoStatistica.DURATA_EVENTI_GLUCOSIO_BASSO);
-
-        try(
-                        java.io.FileOutputStream fos = new java.io.FileOutputStream("cache.bin");
-                        java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(fos);
-                ) {
-                oos.writeObject(cache);
-        } catch (java.io.IOException ex) {
-                ex.printStackTrace();
-        }
-
-        System.out.println("Scritto tutto!");
-		*/
+		try {
+			scriviCache();
+			
+			System.out.println("Scritto tutto!");
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
     
     }
     

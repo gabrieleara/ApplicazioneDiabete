@@ -36,7 +36,7 @@
 
 .bottoneutente:selected {
     -fx-background-image: url(../icons/user-alt.png);
-    //-fx-background-color: #FAFAFA;
+    -fx-background-color: #FAFAFA;
     -fx-text-fill: #303030;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .pannello-comandi,
-.messaggio {
+.errore {
      -fx-alignment: center;
 }
 

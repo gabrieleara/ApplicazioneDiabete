@@ -157,7 +157,7 @@ public class RaccoltaDatiDiabetici {
 		try (
 				FileOutputStream fos = new FileOutputStream("datidiprova.xml");
 		) {
-			fos.write("<?xml version=\"1.0\"?>".getBytes("UTF-8")); //write XML header, as XStream doesn't do that for us
+			fos.write("<?xml version=\"1.0\"?>".getBytes("UTF-8")); // XML header
 			byte[] bytes = str.getBytes("UTF-8");
 			fos.write(bytes);
 		} catch (IOException ex) {

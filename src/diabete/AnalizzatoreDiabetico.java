@@ -163,12 +163,9 @@ public class AnalizzatoreDiabetico {
 								&& attuale.get(Calendar.MINUTE) == cs.get(Calendar.MINUTE);
 					}).collect(Collectors.toList());
 			
-			// System.out.println("Guardo:\t" + cs.getTime());
-			
 			int sum = 0, num = 0;
 			
 			for(GlicemiaRilevata gr : buoni) {
-				// System.out.println("\t\t" + gr.timestamp + "\t" + gr.valore);
 				++num;
 				sum+=gr.valore;
 			}

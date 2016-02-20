@@ -36,9 +36,6 @@ public class CostruttoreUI {
 		return tf;
 	}
 	
-	/*
-	 * @TODO: immagine come sfondo della classe
-	 */
 	public static final Button creaBottoneQuadrato(String id, String testo, String classe) {
 		Button b = new Button(testo);
 		b.getStyleClass().add(classe);
@@ -50,10 +47,6 @@ public class CostruttoreUI {
 		return b;
 	}
 	
-	/*
-	 * @TODO: immagine come sfondo della classe, pallino nascorto e padding
-	 * sinistro necessari.
-	 */
 	public static RadioButton creaBottonePaziente(String nome, String classe, ToggleGroup gruppo) {
 		RadioButton rb = new RadioButton(nome);
 		rb.getStyleClass().add(classe);
@@ -76,9 +69,6 @@ public class CostruttoreUI {
 		pannelloPazienti.getChildren().add(paziente);
 	}
 	
-	/*
-	 * @TODO: recupera classe da impostazioni.
-	 */
 	private static Pane costruisciIntestazione(Button pulsante) {
 		AnchorPane intestazione = new AnchorPane();
 		
@@ -110,9 +100,6 @@ public class CostruttoreUI {
 		return intestazione;
 	}
 	
-	/*
-	 * @TODO: recupera classe da impostazioni.
-	 */
 	private static Pane costruisciPannelloPazienti(ToggleGroup gruppo) {
 		VBox pannello = new VBox();
 		
@@ -149,7 +136,8 @@ public class CostruttoreUI {
 		pgg.setId("pannello-grafico");
 		
 		HBox comandi = new HBox();
-		comandi.setMinHeight(120);
+		comandi.setMinHeight(60);
+		comandi.setMaxHeight(70);
 		comandi.setMinWidth(430);
 		comandi.getStyleClass().add("pannello-comandi");
 
@@ -161,47 +149,50 @@ public class CostruttoreUI {
 		contenuto.setMinWidth(320 + 430);
 		contenuto.setMinHeight(240 + 220);
 		
+		errore.setMinWidth(480);
+		errore.setMaxWidth(480);
+		
 		GridPane.setConstraints(pg, 0, 0, 1, 1);
-		GridPane.setConstraints(pi, 0, 1, 1, 2);
+		GridPane.setConstraints(pi, 0, 1, 1, 3);
 		GridPane.setConstraints(pgb, 1, 1, 1, 1);
 		GridPane.setConstraints(pgg, 1, 0, 1, 1);
 		GridPane.setConstraints(comandi, 1, 2, 1, 1);
-                
-                // GridPane.setConstraints(errore, 1, 3, 1, 1);
 		
-		contenuto.getChildren().addAll(pg, pi, pgb, pgg, comandi/*, errore*/);
+		GridPane.setConstraints(errore, 1, 3, 1, 1);
+		
+		contenuto.getChildren().addAll(pg, pi, pgb, pgg, comandi, errore);
 		
 		return contenuto;
 	}
 	
 	public static Pane costruisciInterfaccia(
-                Button aprifile,
-                Button indietro,
-                Button avanti, 
-                TextField data,
-                ToggleGroup pazienti,
-                Label errore
-        ) {
+			Button aprifile,
+			Button indietro,
+			Button avanti, 
+			TextField data,
+			ToggleGroup pazienti,
+			Label errore
+	) {
 		final BorderPane contenitore = new BorderPane();
 		
 		contenitore.setTop(costruisciIntestazione(aprifile));
 		
 		pannelloPazienti = costruisciPannelloPazienti(pazienti);
-                ScrollPane sp = new ScrollPane();
-                sp.setContent(pannelloPazienti);
-                
-                sp.setHbarPolicy(ScrollBarPolicy.NEVER);
-                sp.setVbarPolicy(ScrollBarPolicy.NEVER);
-                sp.setMinWidth(180);
-				sp.setMaxWidth(180);
-                sp.getStyleClass().add("lista-utenti");
-				String color = (String) GestoreConfigurazione.ottieniParametro(TipoParametro.COLORE_PANNELLO_UTENTI);
-				sp.setStyle("-fx-background-color: " + color);
-                
-                sp.minHeight(pannelloPazienti.minHeightProperty().get());
-                sp.minWidth(pannelloPazienti.minWidthProperty().get());
-                sp.maxHeight(pannelloPazienti.maxHeightProperty().get());
-                sp.maxWidth(pannelloPazienti.maxWidthProperty().get());
+		ScrollPane sp = new ScrollPane();
+		sp.setContent(pannelloPazienti);
+		
+		sp.setHbarPolicy(ScrollBarPolicy.NEVER);
+		sp.setVbarPolicy(ScrollBarPolicy.NEVER);
+		sp.setMinWidth(180);
+		sp.setMaxWidth(180);
+		sp.getStyleClass().add("lista-utenti");
+		String color = (String) GestoreConfigurazione.ottieniParametro(TipoParametro.COLORE_PANNELLO_UTENTI);
+		sp.setStyle("-fx-background-color: " + color);
+		
+		sp.minHeight(pannelloPazienti.minHeightProperty().get());
+		sp.minWidth(pannelloPazienti.minWidthProperty().get());
+		sp.maxHeight(pannelloPazienti.maxHeightProperty().get());
+		sp.maxWidth(pannelloPazienti.maxWidthProperty().get());
 
 		contenitore.setLeft(sp);
 		contenitore.setCenter(costruisciPannelliContenuto(indietro, avanti, data, errore));

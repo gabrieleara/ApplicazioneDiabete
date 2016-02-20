@@ -89,7 +89,7 @@ public class ApplicazioneDiabete extends javafx.application.Application {
                         gc = GestoreDatiDiabetici.glicemiaSettimanale(pazienteAttuale, dataAttuale);
 			si = GestoreDatiDiabetici.insulinaSettimanale(pazienteAttuale, dataAttuale);
 		} catch(SQLException ex) {
-			messaggio.set("Errore nel recupero dati dal database!");
+			messaggio.set("Errore nell'interrogazione dal database!");
 			return;
 		}
 		
@@ -105,31 +105,31 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		stato.setStatistiche(statistiche);
 	}
 	
-	private void aggiornaStatistiche(Date data) {
+	private void aggiornaStatistiche(Date data) throws SQLException {
 		Date dataAttuale = stato.getDataAttuale().get();
 		
 		CalendarioSettimanale cal = new CalendarioSettimanale();
 		
 		cal.setTime(data);
 		cal.lunedi();
-                cal.resetTempoDelGiorno();
+		cal.resetTempoDelGiorno();
 		data = cal.getTime();
 		
 		if(data.equals(dataAttuale))
 			return;
-                
-                cal.add(Calendar.DAY_OF_MONTH, 7);
-                data = cal.getTime();
-            try {
-                data =
-                        GestoreDatiDiabetici.settimanaIndietro(
-                                stato.getPazienteAttuale().get(),
-                                data);
-            } catch (SQLException ex) {
-                ex.printStackTrace(); // todo
-            }
-            
-            stato.setDataAttuale(data);
+		
+		cal.add(Calendar.DAY_OF_MONTH, 7);
+		data = cal.getTime();
+		
+		data = GestoreDatiDiabetici.settimanaIndietro(
+				stato.getPazienteAttuale().get(),
+				data);
+		
+		
+		stato.setDataAttuale(data);
+		
+		TextField tf = (TextField) primaryStage.getScene().lookup("#sett-attuale");
+		tf.setText(df.format(data));
 	}
         
 	private void leggiFile() {
@@ -142,16 +142,15 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 
 		if(f == null)
 			return;
-
 		
 		try {
 			nomeFile = f.getCanonicalPath();
 			rdd = LettoreFileXML.leggiFileDatiGlicemici(nomeFile);
 		} catch (SAXException ex) {
-			ex.printStackTrace(); // getMessage();
+			messaggio.set("Errore nella validazione del file XML.");
 			return;
 		} catch (IOException ex) {
-			ex.printStackTrace(); // getMessage();
+			messaggio.set("Errore nella lettura da file.");
 			return;
 		}
 		
@@ -168,13 +167,9 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 			
 			if(rdd.rilevazioni.length > 0)
 				stato.setDataAttuale(rdd.rilevazioni[0].timestamp);
-			/* todo
-                            else if(rdd.iniezioni.length > 0)
-				stato.setDataAttuale(rdd.iniezioni[0].timestamp);
-                        */
-			
+			// messaggio.set("");
 		} catch (SQLException ex) {
-			ex.printStackTrace(); // TODO 
+			messaggio.set("Errore nell'interrogazione del database.");
 		}
 
 	}
@@ -185,9 +180,10 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		stato.getPazienteAttuale().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
 			try {
 				stato.setDataAttuale(GestoreDatiDiabetici.ultimaSettimana(newValue));
+				// messaggio.set("");
 			} catch(SQLException ex) {
 				stato.setDataAttuale(new Date());
-				ex.printStackTrace(); // TODO
+				messaggio.set("Errore nell'interrogazione del database.");
 			}
 			aggiornaStatistiche();
 		});
@@ -200,7 +196,7 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 			aggiornaGrafico();
 		});
 		
-                stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
+		stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
 			while(change.next()) {
 				if(change.wasAdded()) {
 					for(String paziente : change.getAddedSubList()) {
@@ -212,44 +208,81 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		
 		pazienti.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) -> {
 			RadioButton rb = (RadioButton) newValue;
+			
 			if(!stato.getPazienteAttuale().get().equals(rb.getText())) {
+				try {
+					LoggerAzioniUtente.log("Premuto un paziente nella lista.");
+					// messaggio.set("");
+				} catch(IOException ex) {
+					messaggio.set("Errore nell'invio della stringa di log!");
+				}
 				stato.setPazienteAttuale(rb.getText());
-				//aggiornaStatistiche();
 			}
 		});
-		
-                leggiFile.setOnAction((ActionEvent event) -> {
+		leggiFile.setOnAction((ActionEvent event) -> {
+			try {
+				LoggerAzioniUtente.log("Premuto il bottone di apertura file.");
+			} catch(IOException ex) {
+				messaggio.set("Errore nell'invio della stringa di log!");
+			}
+			
 			leggiFile();
 		});
 		
 		settimanaIndietro.setOnAction((ActionEvent event) -> {
-                    try {
-                        stato.setDataAttuale(
-                                GestoreDatiDiabetici.settimanaIndietro(
-                                        stato.getPazienteAttuale().get(),
-                                        stato.getDataAttuale().get()));
-                    } catch (SQLException ex) {
-                        ex.printStackTrace(); // TODO
-                    }
+			try {
+				LoggerAzioniUtente.log("Premuto il bottone di settimana indietro.");
+			} catch(IOException ex) {
+				messaggio.set("Errore nell'invio della stringa di log!");
+			}
+			
+			try {
+				stato.setDataAttuale(
+						GestoreDatiDiabetici.settimanaIndietro(
+								stato.getPazienteAttuale().get(),
+								stato.getDataAttuale().get()));
+				// messaggio.set("");
+			} catch (SQLException ex) {
+				messaggio.set("Errore nell'interrogazione del database.");
+			}
 		});
 		
 		settimanaAvanti.setOnAction((ActionEvent event) -> {
-                    try {
-                        stato.setDataAttuale(
-                                GestoreDatiDiabetici.settimanaAvanti(
-                                        stato.getPazienteAttuale().get(),
-                                        stato.getDataAttuale().get()));
-                    } catch (SQLException ex) {
-                        ex.printStackTrace(); // TODO
-                    }
+			try {
+				LoggerAzioniUtente.log("Premuto il bottone di settimana avanti.");
+			} catch(IOException ex) {
+				messaggio.set("Errore nell'invio della stringa di log!");
+			}
+			
+			try {
+				stato.setDataAttuale(
+						GestoreDatiDiabetici.settimanaAvanti(
+								stato.getPazienteAttuale().get(),
+								stato.getDataAttuale().get()));
+				// messaggio.set("");
+			} catch (SQLException ex) {
+				messaggio.set("Errore nell'interrogazione del database.");
+			}
 		});
 		
 		settimanaAttuale.setOnAction((ActionEvent event) -> {
 			try {
+				LoggerAzioniUtente.log("Inserito qualcosa nel campo settimana attuale.");
+			} catch(IOException ex) {
+				messaggio.set("Errore nell'invio della stringa di log!");
+			}
+			
+			try {
 				Date d = df.parse(settimanaAttuale.getText());
+				settimanaAttuale.setText(df.format(d));
 				aggiornaStatistiche(d);
+				// messaggio.set("");
 			} catch(ParseException ex) {
-				ex.printStackTrace(); // TODO
+				messaggio.set("Errore nell'interpretazione della data inserita.");
+				settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
+			} catch (SQLException ex) {
+				messaggio.set("Errore nell'interrogazione del database.");
+				settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
 			}
 		});
 	}
@@ -259,9 +292,9 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		Button settimanaIndietro = CostruttoreUI.creaBottoneQuadrato("sett-indietro", "Indietro", "bottonequadrato");
 		Button settimanaAvanti = CostruttoreUI.creaBottoneQuadrato("sett-avanti", "Avanti", "bottonequadrato");
 		TextField settimanaAttuale = CostruttoreUI.creaCampoTesto("sett-attuale", "setttxt");
-                Label errore = CostruttoreUI.creaEtichetta("errore", "errmsg");
-                
-                errore.textProperty().bind(messaggio);
+		Label errore = CostruttoreUI.creaEtichetta("errore", "errore");
+		
+		errore.textProperty().bind(messaggio);
 		
 		pazienti = new ToggleGroup();
 		
@@ -287,17 +320,19 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 	@Override
 	public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+		messaggio.set("");
         try {
             GestoreConfigurazione.init();
-        }   catch (SAXException | IOException ex) {
-                ex.printStackTrace();
-            }
+        } catch (SAXException | IOException ex) {
+			messaggio.set("Errore nella lettura della configurazione.");
+		}
 		
 		try {
 			Cache cache = Cache.leggiCache();
 			StatoApplicazione.init(cache);
 		} catch(IOException | ClassNotFoundException ex) {
 			StatoApplicazione.init();
+			messaggio.set(messaggio.get() + "\nErrore nella lettura della cache.");
 		}
 		
 		stato = StatoApplicazione.getInstance();
@@ -315,13 +350,17 @@ public class ApplicazioneDiabete extends javafx.application.Application {
 		primaryStage.setScene(scene);
 		
 		primaryStage.setOnCloseRequest((WindowEvent we) -> {
-			Cache.scriviCache();
+			try {
+				Cache.scriviCache();
+			} catch (IOException ex) {
+				messaggio.set("Errore nella scrittura nel file di cache!");
+			}
 		});
 		
 		aggiornaGrafico();
 		aggiornaPazienteVisualizzato();
                 
-        primaryStage.setMinWidth(1030);
+        primaryStage.setMinWidth(1040);
 		primaryStage.setMinHeight(645);
 		primaryStage.show();
 	}

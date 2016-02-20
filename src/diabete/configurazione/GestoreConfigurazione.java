@@ -6,11 +6,7 @@
 package diabete.configurazione;
 
 import com.thoughtworks.xstream.XStream;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.*;
 import org.xml.sax.SAXException;
 
 /**
@@ -49,8 +45,7 @@ public class GestoreConfigurazione {
         ) {
             dos.writeUTF(new XStream().toXML(c));
         } catch (IOException ex) {
-            Logger.getLogger(GestoreConfigurazione.class.getName()).log(Level.SEVERE, null, ex);
-            // return;
+            
         }
     }
     
