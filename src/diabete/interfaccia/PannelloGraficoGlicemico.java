@@ -5,7 +5,6 @@
  */
 package diabete.interfaccia;
 
-import diabete.AnalizzatoreDiabetico;
 import diabete.configurazione.GestoreConfigurazione;
 import diabete.configurazione.TipoParametro;
 import diabete.util.ConvertitoreTemporale;

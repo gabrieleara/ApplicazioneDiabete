@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package diabete;
 
 import diabete.dati.*;
 import diabete.util.CalendarioSettimanale;
+
 import java.util.Collection;
 import java.util.Date;
 import javafx.beans.property.*;
@@ -36,32 +32,8 @@ public class StatoApplicazione {
 	public static StatoApplicazione getInstance() throws NullPointerException {
 		return stato;
 	}
-	/*
-	private StatoApplicazione() {
-		this.pazienti = new SimpleListProperty<>();
-		this.pazienteAttuale = new SimpleStringProperty();
-		this.datiPerGrafico = new SimpleListProperty<>();
-		this.statistiche = new IntegerProperty[7];
-		this.dataAttuale = new SimpleObjectProperty<>();
-	}
-	*/
-	private StatoApplicazione(Cache c) {
-		this();
-		
-		this.pazienti.addAll(c.getPazienti());
-		
-		this.pazienteAttuale.set(c.getPazienteAttuale());
-		
-		datiPerGrafico.addAll(c.getDatiPerGrafico());
-		
-		for(int i = 0; i < TipoStatistica.NUMERO_TIPI_STATISTICHE; ++i)
-			this.statistiche[i].set(c.getStatistiche()[i]);
-		
-		this.dataAttuale.set(c.getDataAttuale());
-		
-	}
-	
-	private StatoApplicazione() {
+    
+    private StatoApplicazione() {
 		ObservableList<String> observableList = FXCollections.observableArrayList();
 		this.pazienti = new SimpleListProperty<>(observableList);
 		
@@ -79,6 +51,22 @@ public class StatoApplicazione {
 		cs.setTime(new Date());
 		cs.lunedi();
 		this.dataAttuale = new SimpleObjectProperty<>(cs.getTime());
+		
+	}
+    
+	private StatoApplicazione(Cache c) {
+		this();
+		
+		this.pazienti.addAll(c.getPazienti());
+		
+		this.pazienteAttuale.set(c.getPazienteAttuale());
+		
+		datiPerGrafico.addAll(c.getDatiPerGrafico());
+		
+		for(int i = 0; i < TipoStatistica.NUMERO_TIPI_STATISTICHE; ++i)
+			this.statistiche[i].set(c.getStatistiche()[i]);
+		
+		this.dataAttuale.set(c.getDataAttuale());
 		
 	}
 

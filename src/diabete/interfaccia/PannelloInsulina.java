@@ -34,18 +34,18 @@ public class PannelloInsulina extends javafx.scene.layout.VBox {
 		
 		totale.bind(azioneRapida.add(azioneLenta));
 		
-		Elemento titolo = new Elemento("Insulina registrata giornaliera", "");
+		ElementoStatistico titolo = new ElementoStatistico("Insulina registrata giornaliera", "");
 		
 		titolo.setTitolo();
 		
-		Elemento rapida = new Elemento("Insulina ad azione rapida", "unità/giorno", "rapida");
+		ElementoStatistico rapida = new ElementoStatistico("Insulina ad azione rapida", "unità/giorno", "rapida");
 		rapida.getValoreProperty().bind(Bindings.convert(this.azioneRapida));
 		
-		Elemento lenta = new Elemento("Insulina ad azione lenta", "unità/giorno", "lenta");
+		ElementoStatistico lenta = new ElementoStatistico("Insulina ad azione lenta", "unità/giorno", "lenta");
 		lenta.getValoreProperty().bind(Bindings.convert(this.azioneLenta));
 		
 		
-		Elemento somma = new Elemento("Insulina giornaliera totale", "unità/giorno");
+		ElementoStatistico somma = new ElementoStatistico("Insulina giornaliera totale", "unità/giorno");
 		somma.getValoreProperty().bind(Bindings.convert(this.totale));
 		
 		somma.setGrassetto();

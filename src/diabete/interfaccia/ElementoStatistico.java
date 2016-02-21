@@ -17,14 +17,14 @@ import javafx.scene.text.TextAlignment;
  *
  * @author Gabriele Ara
  */
-public class Elemento extends AnchorPane {
+public class ElementoStatistico extends AnchorPane {
 	private Label nome;
 	private Label valore;
 	private Label unita;
 	
 	private Pane riga;
 	
-	public Elemento(String nome, String unita) {
+	public ElementoStatistico(String nome, String unita) {
 		super();
 		
 		ObservableList<Node> nodes = super.getChildren();
@@ -86,7 +86,7 @@ public class Elemento extends AnchorPane {
 		return valore.textProperty();
 	}
 	
-	public Elemento(String nome, String unita, String imgUrl) {
+	public ElementoStatistico(String nome, String unita, String imgUrl) {
 		this(nome, unita);
 		
 		this.nome.setMaxWidth(190);

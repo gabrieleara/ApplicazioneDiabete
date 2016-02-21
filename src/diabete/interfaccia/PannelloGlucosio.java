@@ -38,18 +38,18 @@ public class PannelloGlucosio extends javafx.scene.layout.VBox {
 		IntegerProperty tot = new SimpleIntegerProperty(100);
 		valoreDentro.bind(tot.subtract(valoreSopra.add(valoreSotto)));
 		
-		Elemento titolo = new Elemento("Glucosio medio", "mg/dL");
+		ElementoStatistico titolo = new ElementoStatistico("Glucosio medio", "mg/dL");
 		titolo.getValoreProperty().bind(Bindings.convert(valoreMedio));
 		
 		titolo.setTitolo();
 		
-		Elemento sopra = new Elemento("% sopra l'intervallo", "%");
+		ElementoStatistico sopra = new ElementoStatistico("% sopra l'intervallo", "%");
 		sopra.getValoreProperty().bind(Bindings.convert(valoreSopra));
 		
-		Elemento dentro = new Elemento("% nell'intervallo", "%");
+		ElementoStatistico dentro = new ElementoStatistico("% nell'intervallo", "%");
 		dentro.getValoreProperty().bind(Bindings.convert(valoreDentro));
 		
-		Elemento sotto = new Elemento("% sotto l'intervallo", "%");
+		ElementoStatistico sotto = new ElementoStatistico("% sotto l'intervallo", "%");
 		sotto.getValoreProperty().bind(Bindings.convert(valoreSotto));
 		
 		super.getChildren().addAll(titolo, sopra, dentro, sotto);

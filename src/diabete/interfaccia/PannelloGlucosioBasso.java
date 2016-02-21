@@ -31,11 +31,11 @@ public class PannelloGlucosioBasso extends javafx.scene.layout.VBox {
 		this.eventi.bind(stat[TipoStatistica.EVENTI_GLUCOSIO_BASSO.valore]);
 		this.durata.bind(stat[TipoStatistica.DURATA_EVENTI_GLUCOSIO_BASSO.valore]);
 		
-		Elemento titolo = new Elemento("Eventi di glucosio basso", "");
+		ElementoStatistico titolo = new ElementoStatistico("Eventi di glucosio basso", "");
 		titolo.getValoreProperty().bind(Bindings.convert(this.eventi));
 		titolo.setTitolo();
 		
-		Elemento valore = new Elemento("Duarata media", "min");
+		ElementoStatistico valore = new ElementoStatistico("Duarata media", "min");
 		valore.getValoreProperty().bind(Bindings.convert(this.durata));
 		
 		super.getChildren().addAll(titolo, valore);
