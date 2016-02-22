@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="diabete.configurazione.Configurazione">
+		<xs:complexType>
+		<xs:sequence>
+			<xs:element name="stile">
+				<xs:complexType>
+				<xs:sequence>
+					<xs:element name="percorsoCss" type="xs:string" />
+					<xs:element name="nomeFont" type="xs:string" />
+					<xs:element name="coloreIntestazione" type="xs:string" />
+					<xs:element name="colorePannelloUtenti" type="xs:string" />
+					<xs:element name="coloreUtenteSelezionato" type="xs:string" />
+					<xs:element name="coloreLineaGrafico" type="xs:string" />
+					<xs:element name="coloreSfondoGrafico" type="xs:string" />
+				</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="logging">
+				<xs:complexType>
+				<xs:sequence>
+					<xs:element name="ipServer" type="xs:string" />
+					<xs:element name="ipLocale" type="xs:string" />
+					<xs:element name="portaServer" type="xs:int" />
+				</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="soglie">
+				<xs:complexType>
+				<xs:sequence>
+					<xs:element name="sogliaGlicemiaAlta" type="xs:int" />
+					<xs:element name="sogliaGlicemiaBassa" type="xs:int" />
+				</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

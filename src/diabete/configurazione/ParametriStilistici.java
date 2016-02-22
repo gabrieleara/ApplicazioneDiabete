@@ -24,12 +24,12 @@ public class ParametriStilistici {
     }
 
     public ParametriStilistici() {
-        this.percorsoCss = "stile.css";
+        this.percorsoCss = "res/styles/style.css";
         this.nomeFont = "sans-serif";
         this.coloreIntestazione = "#00BCD4";
         this.colorePannelloUtenti = "#0097A7";
-        this.coloreUtenteSelezionato = "#727272";
+        this.coloreUtenteSelezionato = "#FAFAFA";
         this.coloreLineaGrafico = "#607D8B";
-        this.coloreSfondoGrafico = "#B6B6B6";
+        this.coloreSfondoGrafico = "#F6F6F6";
     }
 }

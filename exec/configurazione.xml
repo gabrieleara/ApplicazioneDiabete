@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diabete.configurazione.Configurazione>
+	<stile>
+		<percorsoCss>res/styles/style.css</percorsoCss>
+		<nomeFont>sans-serif</nomeFont>
+		<coloreIntestazione>#00BCD4</coloreIntestazione>
+		<colorePannelloUtenti>#0097A7</colorePannelloUtenti>
+		<coloreUtenteSelezionato>#FAFAFA</coloreUtenteSelezionato>
+		<coloreLineaGrafico>#607D8B</coloreLineaGrafico>
+		<coloreSfondoGrafico>#F6F6F6</coloreSfondoGrafico>
+	</stile>
+	<logging>
+		<ipServer>127.0.0.1</ipServer>
+		<ipLocale>127.0.0.1</ipLocale>
+		<portaServer>13994</portaServer>
+	</logging>
+	<soglie>
+		<sogliaGlicemiaAlta>170</sogliaGlicemiaAlta>
+		<sogliaGlicemiaBassa>70</sogliaGlicemiaBassa>
+	</soglie>
+</diabete.configurazione.Configurazione>

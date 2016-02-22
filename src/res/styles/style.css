@@ -78,6 +78,7 @@
 
 #pannello-glucosio {
     -fx-background-image: url(../icons/monitor.png);
+    -fx-background-position: 20px 23px;
 }
 
 #pannello-glucosio .titolo .valore {

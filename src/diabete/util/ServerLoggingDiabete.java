@@ -69,7 +69,8 @@ public class ServerLoggingDiabete {
                                     s.getInetAddress().getHostAddress(),
                                     new Date(),
                                     dis.readUTF());
-                    System.out.println("Scrittura di " + azione);
+                    System.out.println("Scrittura di:");
+                    System.out.println(azione);
                     
                     appendiSuFile("diabetelog.xml", azione);
                     
