@@ -29,107 +29,107 @@ public class RaccoltaDatiDiabetici {
     }
     
     public static void main(String args[]) {
-		// 01
-		CalendarioSettimanale cs = new CalendarioSettimanale();
-		CalendarioSettimanale fine = new CalendarioSettimanale();
-		
-		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-		
-		Date settimana = null;
-		String pazienteSim = null;
-		
-		try {
-            byte[] encoded = Files.readAllBytes(Paths.get("args.txt"));
-			Pattern p = Pattern.compile("(.+),(.+)");
-			
-			String s = new String(encoded);
-            
-			Matcher m = p.matcher(s);
-			if(!m.matches())
-				return;
-			
-            pazienteSim = m.group(1);
-			
-			settimana = df.parse(m.group(2));
-			
-		} catch (IOException | ParseException ex) {
-			ex.printStackTrace();
-            return;
-		}
-		
-		cs.setTime(settimana);
-		cs.domenica();
-		cs.setMezzanotte();
-		fine.setTime(cs.getTime());
-		
-		cs.setTime(settimana);
-		cs.lunedi();
-		
-		cs.resetTempoDelGiorno();
-		
-        System.out.println("Paziente:\t" + pazienteSim);
-		System.out.println("Inizio:\t\t" + cs.getTime());
-		System.out.println("Fine:\t\t" + fine.getTime());
+        // 01
+        CalendarioSettimanale cs = new CalendarioSettimanale();
+        CalendarioSettimanale fine = new CalendarioSettimanale();
         
-		ArrayList<GlicemiaRilevata> gc = new ArrayList<>();
-		
-		int glicemiaPrecedente = 100;
-		int raggio = 25;
-		int variazione;
-		int casuale;
-		
-		boolean decrescita = false;
-		boolean crescita = false;
-		
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        
+        Date settimana = null;
+        String pazienteSim = null;
+        
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get("args.txt"));
+            Pattern p = Pattern.compile("(.+),(.+)");
+            
+            String s = new String(encoded);
+            
+            Matcher m = p.matcher(s);
+            if(!m.matches())
+                return;
+            
+            pazienteSim = m.group(1);
+            
+            settimana = df.parse(m.group(2));
+            
+        } catch (IOException | ParseException ex) {
+            ex.printStackTrace();
+            return;
+        }
+        
+        cs.setTime(settimana);
+        cs.impostaDomenica();
+        cs.impostaMezzanotte();
+        fine.setTime(cs.getTime());
+        
+        cs.setTime(settimana);
+        cs.impostaLunedi();
+        
+        cs.resetTempoDelGiorno();
+        
+        System.out.println("Paziente:\t" + pazienteSim);
+        System.out.println("Inizio:\t\t" + cs.getTime());
+        System.out.println("Fine:\t\t" + fine.getTime());
+        
+        ArrayList<GlicemiaRilevata> gc = new ArrayList<>();
+        
+        int glicemiaPrecedente = 100;
+        int raggio = 25;
+        int variazione;
+        int casuale;
+        
+        boolean decrescita = false;
+        boolean crescita = false;
+        
         // 02
-		while(cs.before(fine)) {
+        while(cs.before(fine)) {
             // 02.1
-			casuale = (int) Math.round(Math.random() * raggio);
-			
+            casuale = (int) Math.round(Math.random() * raggio);
+            
             // 02.2 - 02.3 - 02.4
-			if(crescita)
-				variazione = casuale / 4 + 5;
-			else if(decrescita)
-				variazione = -casuale;
-			else
-				variazione = casuale - 13;
-			
+            if(crescita)
+                variazione = casuale / 4 + 5;
+            else if(decrescita)
+                variazione = -casuale;
+            else
+                variazione = casuale - 13;
+            
             glicemiaPrecedente += variazione;
-			
+            
             // 02.5
-			if(decrescita && glicemiaPrecedente < 90)
-				decrescita = false;
-			
+            if(decrescita && glicemiaPrecedente < 90)
+                decrescita = false;
+            
             // 02.6
-			if(glicemiaPrecedente > 270)
-				decrescita = true;
-			
+            if(glicemiaPrecedente > 270)
+                decrescita = true;
+            
             // 02.7
-			if(crescita && glicemiaPrecedente > 160)
-				crescita = false;
-			
+            if(crescita && glicemiaPrecedente > 160)
+                crescita = false;
+            
             // 02.8
-			if(glicemiaPrecedente < 50)
-				crescita = true;
+            if(glicemiaPrecedente < 50)
+                crescita = true;
             
             // 02.9
             glicemiaPrecedente += variazione;
             
-			gc.add(new GlicemiaRilevata(cs.getTime(), glicemiaPrecedente));
-			
-			cs.add(Calendar.MINUTE, 15);
-		}
-		
-		GlicemiaRilevata[] glicemia = gc.toArray(new GlicemiaRilevata[gc.size()]);
-		
-		cs.setTime(settimana);
-		cs.lunedi();
-		
-		ArrayList<IniezioneInsulina> ii = new ArrayList<>();
-		
+            gc.add(new GlicemiaRilevata(cs.getTime(), glicemiaPrecedente));
+            
+            cs.add(Calendar.MINUTE, 15);
+        }
+        
+        GlicemiaRilevata[] glicemia = gc.toArray(new GlicemiaRilevata[gc.size()]);
+        
+        cs.setTime(settimana);
+        cs.impostaLunedi();
+        
+        ArrayList<IniezioneInsulina> ii = new ArrayList<>();
+        
         // 03
-		for(int i = 0; i < 7; ++i) {
-			ii.add(new IniezioneInsulina(TipoInsulina.INSULINA_LENTA, cs.getTime(), (int) Math.floor(Math.random() * 3 + 6)));
+        for(int i = 0; i < 7; ++i) {
+            ii.add(new IniezioneInsulina(TipoInsulina.INSULINA_LENTA, cs.getTime(), (int) Math.floor(Math.random() * 3 + 6)));
             
             if(Math.random() > 0.2)
                 ii.add(new IniezioneInsulina(TipoInsulina.INSULINA_RAPIDA, cs.getTime(), (int) Math.floor(Math.random() * 3 + 2)));
@@ -139,23 +139,23 @@ public class RaccoltaDatiDiabetici {
             cs.add(Calendar.DAY_OF_MONTH, 1);
         }
         
-		IniezioneInsulina[] iniezione = ii.toArray(new IniezioneInsulina[ii.size()]);
+        IniezioneInsulina[] iniezione = ii.toArray(new IniezioneInsulina[ii.size()]);
         
         RaccoltaDatiDiabetici rdd =
                 new RaccoltaDatiDiabetici(pazienteSim,
                         glicemia, iniezione);
         
         String str = new XStream().toXML(rdd);
-		
-		try (
-				FileOutputStream fos = new FileOutputStream("datidiprova.xml");
-		) {
-			fos.write("<?xml version=\"1.0\"?>".getBytes("UTF-8")); // XML header
-			byte[] bytes = str.getBytes("UTF-8");
-			fos.write(bytes);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+        
+        try (
+                FileOutputStream fos = new FileOutputStream("datidiprova.xml");
+        ) {
+            fos.write("<?xml version=\"1.0\"?>".getBytes("UTF-8")); // XML header
+            byte[] bytes = str.getBytes("UTF-8");
+            fos.write(bytes);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }
 
@@ -228,7 +228,7 @@ public class RaccoltaDatiDiabetici {
         I valori generati con questo algoritmo presentano il giusto grado di
         variabilità e le caratteristiche principali proprie del processo
         modellato, seppur essendone una grossa semplificazione, visto che
-        questo algoritmo non tiene conto d fattori come i pasti, l'attività
+        questo algoritmo non tiene conto di fattori come i pasti, l'attività
         fisica, il riposo, ecc., che influiscono non poco su questo processo.
 
     03) Generazione di valori casuali di insulina registrata in una giornata.

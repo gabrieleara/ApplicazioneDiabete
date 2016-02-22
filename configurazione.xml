@@ -7,7 +7,7 @@
 		<colorePannelloUtenti>#0097A7</colorePannelloUtenti>
 		<coloreUtenteSelezionato>#FAFAFA</coloreUtenteSelezionato>
 		<coloreLineaGrafico>#607D8B</coloreLineaGrafico>
-		<coloreSfondoGrafico>#B6B6B6</coloreSfondoGrafico>
+		<coloreSfondoGrafico>#F6F6F6</coloreSfondoGrafico>
 	</stile>
 	<logging>
 		<ipServer>127.0.0.1</ipServer>

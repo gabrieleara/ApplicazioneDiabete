@@ -106,7 +106,7 @@ public class GestoreDatiDiabetici {
         CalendarioSettimanale cs = new CalendarioSettimanale();
         cs.setTime(data);
         
-        cs.lunedi();
+        cs.impostaLunedi();
         cs.resetTempoDelGiorno();
         
         return cs.getTime();
@@ -126,10 +126,10 @@ public class GestoreDatiDiabetici {
         CalendarioSettimanale cs = new CalendarioSettimanale();
         cs.setTime(settimana);
         if(avanti) {
-            cs.domenica();
-            cs.setMezzanotte();
+            cs.impostaDomenica();
+            cs.impostaMezzanotte();
         } else {
-            cs.lunedi();
+            cs.impostaLunedi();
             cs.resetTempoDelGiorno();
         }
         
@@ -158,7 +158,7 @@ public class GestoreDatiDiabetici {
         
         cs.setTime(data);
         
-        cs.lunedi();
+        cs.impostaLunedi();
         cs.resetTempoDelGiorno();
         
         return cs.getTime();
@@ -177,13 +177,13 @@ public class GestoreDatiDiabetici {
         
         CalendarioSettimanale cs = new CalendarioSettimanale();
         cs.setTime(data);
-        cs.lunedi();
+        cs.impostaLunedi();
         cs.resetTempoDelGiorno();
         
         String dataFormattata = df.format(cs.getTime());
         
-        cs.domenica();
-        cs.setMezzanotte();
+        cs.impostaDomenica();
+        cs.impostaMezzanotte();
         
         String fineDataFormattata = df.format(cs.getTime());
         
@@ -220,13 +220,13 @@ public class GestoreDatiDiabetici {
         
         CalendarioSettimanale cs = new CalendarioSettimanale();
         cs.setTime(data);
-        cs.lunedi();
+        cs.impostaLunedi();
         cs.resetTempoDelGiorno();
         
         String dataFormattata = df.format(cs.getTime());
         
-        cs.domenica();
-        cs.setMezzanotte();
+        cs.impostaDomenica();
+        cs.impostaMezzanotte();
         
         String fineDataFormattata = df.format(cs.getTime());
         

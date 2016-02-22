@@ -21,45 +21,45 @@ public class Cache implements java.io.Serializable {
     private final ArrayList<String> pazienti;
     private final String pazienteAttuale;
     private final Date dataAttuale;
-	
-	private static final String cacheFileName = "cache.bin";
+    
+    private static final String cacheFileName = "cache.bin";
 
     public static Cache leggiCache() throws IOException, ClassNotFoundException {
-		Cache c;
+        Cache c;
         try(
             FileInputStream fis = new FileInputStream(cacheFileName);
             ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             c = (Cache) ois.readObject();
         }
-		return c;
+        return c;
     }
 
     public static void scriviCache() throws IOException {
         // 01
-		Cache c = new Cache(StatoApplicazione.getInstance());
+        Cache c = new Cache(StatoApplicazione.getInstance());
         try (
             FileOutputStream fos = new FileOutputStream(cacheFileName);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
            oos.writeObject(c);
-		}
+        }
     }
-	
-	private Cache(StatoApplicazione stato) {
-		this.datiPerGrafico = new ArrayList<>(stato.getDatiPerGrafico());
-		
-		this.pazienti = new ArrayList<>(stato.getPazienti());
-		
-		this.pazienteAttuale = stato.getPazienteAttuale().get();
-		
-		this.dataAttuale = stato.getDataAttuale().get();
-		
-		this.statistiche = new int[TipoStatistica.NUMERO_TIPI_STATISTICHE];
-		
-		for(int i = 0; i < TipoStatistica.NUMERO_TIPI_STATISTICHE; ++i)
-			this.statistiche[i] = stato.getStatistiche()[i].get();
-	}
+    
+    private Cache(StatoApplicazione stato) {
+        this.datiPerGrafico = new ArrayList<>(stato.glicemieRilevateProperty());
+        
+        this.pazienti = new ArrayList<>(stato.pazientiProperty());
+        
+        this.pazienteAttuale = stato.pazienteAttualeProperty().get();
+        
+        this.dataAttuale = stato.dataAttualeProperty().get();
+        
+        this.statistiche = new int[TipoStatistica.NUMERO_TIPI_STATISTICHE];
+        
+        for(int i = 0; i < TipoStatistica.NUMERO_TIPI_STATISTICHE; ++i)
+            this.statistiche[i] = stato.statisticheProperty()[i].get();
+    }
 
     public ArrayList<GlicemiaRilevata> getDatiPerGrafico() {
         return datiPerGrafico;
@@ -76,10 +76,10 @@ public class Cache implements java.io.Serializable {
     public Date getDataAttuale() {
         return dataAttuale;
     }
-	
-	public int[] getStatistiche() {
-		return statistiche;
-	}
+    
+    public int[] getStatistiche() {
+        return statistiche;
+    }
 
     public int getStatistica(TipoStatistica tipo) {
         return statistiche[tipo.valore];

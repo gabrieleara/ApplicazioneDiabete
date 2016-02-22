@@ -81,11 +81,15 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
             } catch (IOException ex) {
                 messaggio.set("Errore nella scrittura nel file di cache!");
             }
+            
+            log("Applicazione terminata.");
         });
         
         // 01
         aggiornaPazienteVisualizzato();
         aggiornaGrafico();
+        
+        log("Applicazione avviata.");
         
         primaryStage.show();
     }
@@ -96,13 +100,13 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
     }
 
     private void aggiornaData(Date data) throws SQLException {
-        Date dataAttuale = stato.getDataAttuale().get();
+        Date dataAttuale = stato.dataAttualeProperty().get();
 
         CalendarioSettimanale cal = new CalendarioSettimanale();
         
         // 02
         cal.setTime(data);
-        cal.lunedi();
+        cal.impostaLunedi();
         cal.resetTempoDelGiorno();
         data = cal.getTime();
 
@@ -113,7 +117,7 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
         cal.add(Calendar.DAY_OF_MONTH, 7);
         data = cal.getTime();
         data = GestoreDatiDiabetici.cambiaSettimanaIndietro(
-                stato.getPazienteAttuale().get(),
+                stato.pazienteAttualeProperty().get(),
                 data);
         
         stato.setDataAttuale(data);
@@ -129,14 +133,14 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
             PannelloGraficoGlicemico pgg = (PannelloGraficoGlicemico)
             primaryStage.sceneProperty().get().lookup("#pannello-grafico");
             pgg.aggiornaDati(AnalizzatoreDatiDiabetici
-                    .analizzaGlicemiaMediaOraria(stato.getDatiPerGrafico()));
+                    .analizzaGlicemiaMediaOraria(stato.glicemieRilevateProperty()));
         } catch (NullPointerException ex) {
             // 05
         }
     }
 
     private void aggiornaPazienteVisualizzato() {
-        String pazienteAttuale = stato.getPazienteAttuale().get();
+        String pazienteAttuale = stato.pazienteAttualeProperty().get();
         ObservableList<Toggle> bottoni = pazienti.getToggles();
 
         String color = (String) GestoreConfigurazione
@@ -156,8 +160,8 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
     }
     
     private void aggiornaStatistiche() {
-        String pazienteAttuale = stato.getPazienteAttuale().get();
-        Date dataAttuale = stato.getDataAttuale().get();
+        String pazienteAttuale = stato.pazienteAttualeProperty().get();
+        Date dataAttuale = stato.dataAttualeProperty().get();
         
         aggiornaPazienteVisualizzato();
         
@@ -177,7 +181,7 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
             return;
         }
         
-        stato.setDatiPerGrafico(gc);
+        stato.setGlicemieRilevate(gc);
         
         int[] statistiche = AnalizzatoreDatiDiabetici.produciStatisticheGlicemiche(gc);
         statistiche[TipoStatistica.INSULINA_LENTA.valore] = si[0];
@@ -213,7 +217,7 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
             GestoreDatiDiabetici.salvaDatiRilevati(rdd);
             
             String paziente = rdd.paziente;
-            Collection listaPazienti = stato.getPazienti();
+            Collection listaPazienti = stato.pazientiProperty();
             
             if(!listaPazienti.contains(paziente))
                 listaPazienti.add(paziente);
@@ -246,12 +250,12 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
         
         impostaListeners(leggiFile, settimanaIndietro, settimanaAvanti, settimanaAttuale);
         
-        Collection<String> lista = stato.getPazienti();
+        Collection<String> lista = stato.pazientiProperty();
         for(String nome : lista) {
             aggiungiPaziente(nome);
         }
         
-        settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
+        settimanaAttuale.setText(df.format(stato.dataAttualeProperty().get()));
         return contenuto;
     }
 
@@ -261,7 +265,7 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
         // 10
         
         // 10.1
-        stato.getPazienteAttuale().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+        stato.pazienteAttualeProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             try {
                 stato.setDataAttuale(
                         GestoreDatiDiabetici.recuperaUltimaSettimana(newValue));
@@ -273,17 +277,17 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
         });
         
         // 10.2
-        stato.getDataAttuale().addListener((ObservableValue<? extends Date> observable, Date oldValue, Date newValue) -> {
+        stato.dataAttualeProperty().addListener((ObservableValue<? extends Date> observable, Date oldValue, Date newValue) -> {
             aggiornaStatistiche();
         });
         
         // 10.3
-        stato.getDatiPerGrafico().addListener((ListChangeListener.Change<? extends GlicemiaRilevata> c) -> {
+        stato.glicemieRilevateProperty().addListener((ListChangeListener.Change<? extends GlicemiaRilevata> c) -> {
             aggiornaGrafico();
         });
         
         // 10.4
-        stato.getPazienti().addListener((ListChangeListener.Change<? extends String> change) -> {
+        stato.pazientiProperty().addListener((ListChangeListener.Change<? extends String> change) -> {
             while(change.next()) {
                 // 11
                 if(change.wasAdded()) {
@@ -298,7 +302,7 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
         pazienti.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) -> {
             RadioButton rb = (RadioButton) newValue;
             
-            if(!stato.getPazienteAttuale().get().equals(rb.getText())) {
+            if(!stato.pazienteAttualeProperty().get().equals(rb.getText())) {
                 log("Premuto un paziente nella lista.");
                 
                 stato.setPazienteAttuale(rb.getText());
@@ -319,8 +323,8 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
             try {
                 stato.setDataAttuale(
                         GestoreDatiDiabetici.cambiaSettimanaIndietro(
-                                stato.getPazienteAttuale().get(),
-                                stato.getDataAttuale().get()));
+                                stato.pazienteAttualeProperty().get(),
+                                stato.dataAttualeProperty().get()));
             } catch (SQLException ex) {
                 messaggio.set("Errore nell'interrogazione del database.");
             }
@@ -333,8 +337,8 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
             try {
                 stato.setDataAttuale(
                         GestoreDatiDiabetici.cambiaSettimanaAvanti(
-                                stato.getPazienteAttuale().get(),
-                                stato.getDataAttuale().get()));
+                                stato.pazienteAttualeProperty().get(),
+                                stato.dataAttualeProperty().get()));
             } catch (SQLException ex) {
                 messaggio.set("Errore nell'interrogazione del database.");
             }
@@ -350,10 +354,10 @@ public class ApplicazioneMonitoraDiabete extends javafx.application.Application 
                 aggiornaData(d);
             } catch(ParseException ex) {
                 messaggio.set("Errore nell'interpretazione della data inserita.");
-                settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
+                settimanaAttuale.setText(df.format(stato.dataAttualeProperty().get()));
             } catch (SQLException ex) {
                 messaggio.set("Errore nell'interrogazione del database.");
-                settimanaAttuale.setText(df.format(stato.getDataAttuale().get()));
+                settimanaAttuale.setText(df.format(stato.dataAttualeProperty().get()));
             }
         });
     }
