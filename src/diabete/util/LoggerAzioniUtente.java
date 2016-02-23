@@ -3,6 +3,7 @@ package diabete.util;
 import diabete.configurazione.*;
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 /**
  *
@@ -22,7 +23,11 @@ public class LoggerAzioniUtente {
             Socket s = new Socket(ipServer, portaServer);
             DataOutputStream dos = new DataOutputStream(s.getOutputStream());
         ) {
-            dos.writeUTF(azione);
+            AzioneUtente dati = new AzioneUtente(
+                    s.getLocalAddress().getHostAddress(),
+                    new Date(),
+                    azione);
+            dos.writeUTF(dati.toString());
         }
         
     }

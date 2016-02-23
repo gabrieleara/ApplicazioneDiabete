@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<diabete.configurazione.Configurazione>
-	<stile>
-		<percorsoCss>res/styles/style.css</percorsoCss>
+<configurazione-diabete>
+	<stile percorsoCss="res/styles/style.css">
 		<nomeFont>sans-serif</nomeFont>
 		<coloreIntestazione>#00BCD4</coloreIntestazione>
 		<colorePannelloUtenti>#0097A7</colorePannelloUtenti>
@@ -18,4 +17,4 @@
 		<sogliaGlicemiaAlta>170</sogliaGlicemiaAlta>
 		<sogliaGlicemiaBassa>70</sogliaGlicemiaBassa>
 	</soglie>
-</diabete.configurazione.Configurazione>
+</configurazione-diabete>

@@ -145,12 +145,19 @@ public class RaccoltaDatiDiabetici {
                 new RaccoltaDatiDiabetici(pazienteSim,
                         glicemia, iniezione);
         
-        String str = new XStream().toXML(rdd);
+        XStream stream = new XStream();
+        
+        stream.alias("raccolta-dati-diabetici", RaccoltaDatiDiabetici.class);
+        stream.alias("glicemia-rilevata", GlicemiaRilevata.class);
+        stream.alias("iniezione-insulina", IniezioneInsulina.class);
+        
+        String str = stream.toXML(rdd);
         
         try (
                 FileOutputStream fos = new FileOutputStream("datidiprova.xml");
         ) {
             fos.write("<?xml version=\"1.0\"?>".getBytes("UTF-8")); // XML header
+            fos.write("\n".getBytes("UTF-8"));
             byte[] bytes = str.getBytes("UTF-8");
             fos.write(bytes);
         } catch (IOException ex) {

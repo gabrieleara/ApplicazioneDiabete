@@ -1,10 +1,10 @@
 package diabete.util;
 
-import com.thoughtworks.xstream.XStream;
 import diabete.configurazione.*;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.xml.sax.*;
 
 /**
@@ -13,29 +13,12 @@ import org.xml.sax.*;
  */
 public class ServerLoggingDiabete {
     
-    public static class AzioneUtente {
-        public final String ipclient;
-        public final Date timestamp;
-        public final String azione;
-
-        public AzioneUtente(String ipclient, Date timestamp, String azione) {
-            this.ipclient = ipclient;
-            this.timestamp = timestamp;
-            this.azione = azione;
-        }
-        
-        @Override
-        public String toString() {
-            return new XStream().toXML(this);
-        }
-    }
-    
-    public static void appendiSuFile(String nomeFile, AzioneUtente azione) {
+    public static void appendiSuFile(String nomeFile, String azione) {
         try(
             FileOutputStream fos = new FileOutputStream(nomeFile, true);
             PrintWriter pw = new PrintWriter(fos);
         ) {
-            pw.write(azione.toString());
+            pw.write(azione);
             pw.write('\n');
         } catch (IOException ex) {
             System.out.println("Errore in scrittura su file in append.");
@@ -43,8 +26,6 @@ public class ServerLoggingDiabete {
     }
     
     public static void main(String[] args) {
-        AzioneUtente azione;
-        
         try {
             GestoreConfigurazione.init();
         } catch (SAXException | IOException ex) {
@@ -64,18 +45,19 @@ public class ServerLoggingDiabete {
                     Socket s = servs.accept();
                     DataInputStream dis = new DataInputStream(s.getInputStream());
                 ) {
-                    azione =
-                            new AzioneUtente(
-                                    s.getInetAddress().getHostAddress(),
-                                    new Date(),
-                                    dis.readUTF());
-                    System.out.println("Scrittura di:");
-                    System.out.println(azione);
+                    String xml = dis.readUTF();
                     
-                    appendiSuFile("diabetelog.xml", azione);
+                    LettoreFileXML.validaStringaXML(xml, "log.xsd");
+                    
+                    System.out.println("Scrittura di:");
+                    System.out.println(xml);
+                    
+                    appendiSuFile("diabetelog.xml", xml);
                     
                 } catch (IOException ex) {
                     System.out.println("Errore in ricezione dei dati!");
+                } catch (SAXException ex) {
+                    System.out.println("Errore in parsing dei dati!");
                 }
             }
         } catch (IOException ex) {

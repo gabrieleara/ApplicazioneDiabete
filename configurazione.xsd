@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-	<xs:element name="diabete.configurazione.Configurazione">
+	<xs:element name="configurazione-diabete">
 		<xs:complexType>
 		<xs:sequence>
 			<xs:element name="stile">
 				<xs:complexType>
 				<xs:sequence>
-					<xs:element name="percorsoCss" type="xs:string" />
 					<xs:element name="nomeFont" type="xs:string" />
 					<xs:element name="coloreIntestazione" type="xs:string" />
 					<xs:element name="colorePannelloUtenti" type="xs:string" />
@@ -14,6 +13,7 @@
 					<xs:element name="coloreLineaGrafico" type="xs:string" />
 					<xs:element name="coloreSfondoGrafico" type="xs:string" />
 				</xs:sequence>
+				<xs:attribute name="percorsoCss" type="xs:string" />
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="logging">

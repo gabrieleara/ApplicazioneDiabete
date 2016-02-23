@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-	<xs:element name="diabete.dati.RaccoltaDatiDiabetici">
+	<xs:element name="raccolta-dati-diabetici">
 		<xs:complexType>
 		<xs:sequence>
 			<xs:element type="xs:string" name="paziente"/>
 			<xs:element name="rilevazioni">
 				<xs:complexType>
 				<xs:sequence>
-					<xs:element ref="diabete.dati.GlicemiaRilevata" maxOccurs="unbounded" minOccurs="0" />
+					<xs:element ref="glicemia-rilevata" maxOccurs="unbounded" minOccurs="0" />
 				</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="iniezioni">
 				<xs:complexType>
 				<xs:sequence>
-					<xs:element ref="diabete.dati.IniezioneInsulina" maxOccurs="unbounded" minOccurs="0" />
+					<xs:element ref="iniezione-insulina" maxOccurs="unbounded" minOccurs="0" />
 				</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="diabete.dati.GlicemiaRilevata">
+	<xs:element name="glicemia-rilevata">
 		<xs:complexType>
 		<xs:sequence>
 			<xs:element type="xs:string" name="timestamp"/>
@@ -29,7 +29,7 @@
 		</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name="diabete.dati.IniezioneInsulina">
+	<xs:element name="iniezione-insulina">
 		<xs:complexType>
 		<xs:sequence>
 			<xs:element name="tipo">
